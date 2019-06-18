@@ -12,7 +12,7 @@ public class TransactionSynchronizationManager {
 	//记录所有事务数据源键值对应的数据库连接持有对象[路由KEY=>Connection]
 	private static final ThreadLocal<Map<String, ConnectionHolder>> connHolderLocal = new ThreadLocal<>();
 	//记录所有开启事务对应的路由KEY[路由KEY]
-	private static final ThreadLocal<Stack<String>> txStackLocal = new ThreadLocal<>();
+	private static final ThreadLocal<Stack<String>> txRouteLocal = new ThreadLocal<>();
 
 	/**
 	 * 数据库连接对象
@@ -22,7 +22,7 @@ public class TransactionSynchronizationManager {
 	 */
 	public static ConnectionHolder getConnectionHolder(String key) {
 		Map<String, ConnectionHolder> map = connHolderLocal.get();
-		if (null == map) {
+		if (null == map || map.isEmpty()) {
 			return null;
 		}
 		return map.get(key);
@@ -32,7 +32,9 @@ public class TransactionSynchronizationManager {
 		return connHolderLocal.get();
 	}
 	public static void clearConnectionHolder(String key) {
-		connHolderLocal.get().remove(key);
+		Map<String, ConnectionHolder> map = connHolderLocal.get();
+		if(null == map) return;
+		map.remove(key);
 	}
 
 	public static void setConnectionHolder(String key, ConnectionHolder connectionHolder) {
@@ -51,38 +53,42 @@ public class TransactionSynchronizationManager {
 	 * @return
 	 */
 	public static boolean isTransactionActive(String key) {
-		Stack<String> stack = txStackLocal.get();
+		Stack<String> stack = txRouteLocal.get();
 		return (null != stack && stack.contains(key)) ? true : false;
 	}
 
-	public static Stack<String> getTxStack() {
-		return txStackLocal.get();
+	public static Stack<String> getTxRouteHolder() {
+		return txRouteLocal.get();
 	}
 
-	public static void pushTxStack(String key) {
-		Stack<String> stack = txStackLocal.get();
-		if (null == stack) {
+	public static void pushTxRouteHolder(String key) {
+		Stack<String> stack = txRouteLocal.get();
+		if(null == stack){
 			stack = new Stack<>();
-			txStackLocal.set(stack);
-		} else {
-			if (stack.contains(key))
-				return;
+			txRouteLocal.set(stack);
+		}
+		if (stack.contains(key)){
+			return;
 		}
 		stack.push(key);
 	}
+	
+	public static void clearTxRouteHolder(String key) {
+		Stack<String> stack = txRouteLocal.get();
+		if(null == stack) return;
+		stack.remove(key);
+	}
 
 	public static boolean isTopTransation(Set<String> keys) {
-		Stack<String> stack = txStackLocal.get();
-		if (null == stack || stack.isEmpty())
-			return true;
-		if (keys.contains(stack.firstElement())) {
-			return true;
+		Stack<String> stack = txRouteLocal.get();
+		if (null == stack || stack.isEmpty()){
+			return false;
 		}
-		return false;
+		return keys.contains(stack.firstElement());
 	}
 
 	public static void clear() {
 		connHolderLocal.remove();
-		txStackLocal.remove();
+		txRouteLocal.remove();
 	}
 }

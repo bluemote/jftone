@@ -32,13 +32,14 @@ public class InterceptorFactory {
 	 */
 	public List<AopInterceptor> getInterceptor(Object proxy, Method method, Object[] params, Class<?> targetClass) {
 		int cpsNum = 0;
+		//从系统启动时候加载的拦截器中获取自定义拦截器切面
 		List<CustomizedPointcut> cps = AspectContext.getAspectPointcuts();
 		cpsNum =cps.size();
 		//多增加一个拦截器长度，保存事务控制拦截器
 		List<AopInterceptor> interceptors = new ArrayList<AopInterceptor>(cpsNum + 1);
 		// 载入事务拦截器
 		TransactionalPointcut tp = AspectContext.getTransactionalPointcut();
-		if (null != tp && tp.isEnabled() && (tp.isAnnotationTransactional(targetClass, method)
+		if ( null != tp && tp.isEnabled() && ( tp.isAnnotationTransactional(targetClass, method)
 		|| tp.isMatchClass(targetClass) && tp.isMatchMethod(method)) ) {
 			//满足事务拦截条件，进入事务拦截管理
 			interceptors.add(new TransactionalInterceptor(targetClass, method));

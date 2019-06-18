@@ -27,8 +27,12 @@ public final class DataSourceSynchronizationManager {
 		}
         return datasourceNameLocal.get().get(routekey);
 	}
-	public static void clearDataSourceName(String routekey) { 
-        datasourceNameLocal.get().remove(routekey);
+	public static void clearDataSourceName(String routekey) {
+		Map<String, String> map = datasourceNameLocal.get();
+		if(null == map){
+			return;
+		}
+		map.remove(routekey);
 	}
 	
 	/**
@@ -59,10 +63,12 @@ public final class DataSourceSynchronizationManager {
 	 */
 	public static String getCurrentDataSourceKey(String routeName){
 		String routeKey = null;
+		//如果不是集群域前缀KEY，则直接返回数据源路由名
 		if(!DataSourceContext.existDomain(routeName)){
 			routeKey = routeName;
 			return routeKey;
 		}
+		//如果是集群数据源路由KEY，则判断是否为事务KEY
 		routeKey = routeKey+Const.SYMBOL_POINT + ClusterDataSource.KEY_MASTER;
 		if(TransactionSynchronizationManager.isTransactionActive(routeKey)){
 			return routeKey;

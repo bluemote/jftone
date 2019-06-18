@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,7 +71,6 @@ public class TransactionManager {
 	public static TransactionStatus getTransaction(Class<?> targetClass, Method method) throws SQLException {
 		String methodName = method.getName();
 		TransactionalPointcut tp = AspectContext.getTransactionalPointcut();
-
 		String[] dsNames = null;
 		// 是否启用事务注解
 		if (tp.isAnnotationTransactional(targetClass, method)) {
@@ -86,15 +84,15 @@ public class TransactionManager {
 			dsNames = new String[] { DataSourceContext.getDefaultRouteName() };
 		}
 		TransactionStatus txStatus = new TransactionStatus(targetClass, methodName);
-		String reouteKey;
+		String routeKey;
 		List<String> dsKeys = new ArrayList<>(dsNames.length);
 		for (String keyName : dsNames) {
-			reouteKey = DataSourceSynchronizationManager.getDataSourceMappingKey(keyName, true); // 获取当前事务名称
-			doGetTransaction(txStatus, reouteKey);
-			dsKeys.add(reouteKey);
+			routeKey = DataSourceSynchronizationManager.getDataSourceMappingKey(keyName, true); // 获取当前事务名称
+			doGetTransaction(txStatus, routeKey);
+			dsKeys.add(routeKey);
 		}
 		// 记录当前路由key
-		txStatus.setDataSourceKey(new HashSet<>(dsKeys));
+		txStatus.setTxRouteKey(new HashSet<>(dsKeys));
 		return txStatus;
 	}
 
@@ -110,7 +108,7 @@ public class TransactionManager {
 	protected static void doGetTransaction(TransactionStatus txStatus, String routeKey) throws SQLException {
 		boolean txState = false;
 		// 记录事务路由KEY,如果已经记录，则不压入堆栈
-		TransactionSynchronizationManager.pushTxStack(routeKey);
+		TransactionSynchronizationManager.pushTxRouteHolder(routeKey);
 		Connection conn = DataSourceUtil.getConnection(routeKey);
 		// 如果没有开启事务，则开启
 		if (conn.getAutoCommit()) {
@@ -134,8 +132,8 @@ public class TransactionManager {
 			return;
 		}
 		// 必须是新事物，同时当前为栈顶事务（非栈顶事务表示是嵌套子事务，不做处理，递归到外层，由外层程序提交总事务）
-		if (!txStatus.isNewTransaction() || !TransactionSynchronizationManager
-				.isTopTransation(txStatus.getDataSourceKey())) {
+		if (!txStatus.hasNewTransaction() || !TransactionSynchronizationManager
+				.isTopTransation(txStatus.getTxRouteKey())) {
 			return;
 		}
 		if (log.isDebugEnabled()) {
@@ -145,15 +143,12 @@ public class TransactionManager {
 	}
 
 	private static void doCommit(TransactionStatus txStatus) throws SQLException {
-		Stack<String> txKeyStack = TransactionSynchronizationManager.getTxStack();
 		ConnectionHolder connHolder;
-		Set<String> keys = txStatus.getDataSourceKey();
+		Set<String> keys = txStatus.getTxRouteKey();
 		for (String routeKey : keys) {
 			if (!txStatus.isNewTransaction(routeKey)) {
 				continue;
 			}
-			// 移除当前事务
-			txKeyStack.remove(routeKey);
 			connHolder = TransactionSynchronizationManager.getConnectionHolder(routeKey);
 			connHolder.getConnection().commit();
 		}
@@ -168,31 +163,25 @@ public class TransactionManager {
 		if (null == txStatus || txStatus.empty()) {
 			return;
 		}
+		if (!txStatus.hasNewTransaction() || !TransactionSynchronizationManager
+				.isTopTransation(txStatus.getTxRouteKey())) {
+			return;
+		}
 		if (log.isDebugEnabled()) {
 			log.debug("回滚[" + txStatus + "]事务");
 		}
-		doRollback(txStatus.getDataSourceKey());
+		doRollback(txStatus);
 	}
 
-	private static void doRollback(Set<String> keys) throws SQLException {
-		Stack<String> txKeyStack = TransactionSynchronizationManager.getTxStack();
-		String txKey;
+	private static void doRollback(TransactionStatus txStatus) throws SQLException {
 		ConnectionHolder connHolder;
-		int total = keys.size();
-		int curSize = 0;
-		// 在当前堆栈前面的事务全部回滚，然后调出，通过外部抛错继续递归回滚
-		while (!txKeyStack.empty()) {
-			txKey = txKeyStack.pop();
-			if (keys.contains(txKey)) {
-				curSize++;
+		Set<String> keys = txStatus.getTxRouteKey();
+		for (String routeKey : keys) {
+			if (!txStatus.isNewTransaction(routeKey)) {
+				continue;
 			}
-			if (curSize <= total) {
-				connHolder = TransactionSynchronizationManager.getConnectionHolder(txKey);
-				connHolder.getConnection().rollback();
-			}
-			if (curSize == total) {
-				break;
-			}
+			connHolder = TransactionSynchronizationManager.getConnectionHolder(routeKey);
+			connHolder.getConnection().rollback();
 		}
 	}
 
@@ -211,18 +200,16 @@ public class TransactionManager {
 	private static void doReleaseResource(TransactionStatus txStatus) {
 		try {
 			ConnectionHolder connHolder;
-			Set<String> keys = txStatus.getDataSourceKey();
+			Set<String> keys = txStatus.getTxRouteKey();
 			for (String key : keys) {
 				connHolder = TransactionSynchronizationManager.getConnectionHolder(key);
 				DataSourceUtil.releaseConnection(connHolder.getConnection(), key);
-				if (txStatus.isNewTransaction(key)) {
+				if (txStatus.isNewTransaction(key) && 
+						TransactionSynchronizationManager.isTopTransation(keys)) {
 					TransactionSynchronizationManager.clearConnectionHolder(key);
+					TransactionSynchronizationManager.clearTxRouteHolder(key);
 					DataSourceSynchronizationManager.clearDataSourceName(key);
 				}
-			}
-			if(TransactionSynchronizationManager.isTopTransation(keys)){
-				TransactionSynchronizationManager.clear();
-				DataSourceSynchronizationManager.clear();
 			}
 		} catch (Exception e) {
 			log.debug("释放[" + txStatus + "]事务数据连接错误", e);

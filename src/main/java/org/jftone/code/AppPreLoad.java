@@ -20,7 +20,7 @@ public class AppPreLoad {
 			//生成模型对象文件
 			CodeGenerate codeGenerate = new CodeGenerate();
 			//codeGenerate.generateCode("D:\\Project\\Lamapai\\", true);
-			codeGenerate.generateCode("D:\\Project\\Carbid\\java", true);
+			codeGenerate.generateCode("D:\\Project\\SoundWeb\\src\\main\\java", true);
 			//codeGenerate.generateCode("E:\\Project\\HbyWeb\\", true);
 		}finally{
 			JFToneApp.destroyed();

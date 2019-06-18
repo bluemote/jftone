@@ -14,6 +14,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.jftone.jdbc.MySQLWrapper;
 import org.jftone.jdbc.SqlWrapper;
 
@@ -153,9 +154,16 @@ public final class DataSourceContext {
 		return datasourceName;
 	}
 
-	public static void destroyed() {
-		if (datasourceMap.isEmpty())
+	public static void destroyed() throws SQLException {
+		if (datasourceMap.isEmpty()){
 			return;
+		}
+		//释放数据库连接
+		for(Map.Entry<String, DataSource> ds : datasourceMap.entrySet()){
+			if(ds.getValue() instanceof BasicDataSource){
+				((BasicDataSource)ds.getValue()).close();
+			}
+		}
 		// 清理集群配置数据
 		ClusterDataSource.destroyed();
 		datasourceMap.clear();

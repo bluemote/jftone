@@ -40,6 +40,7 @@ public final class TransactionalInterceptor implements AopInterceptor {
 			throw new ServiceException(e);
 		} finally { 
 			TransactionManager.releaseResource(txStatus);
+			txStatus = null;
         }
 		return retVal;
 	}
