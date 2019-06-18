@@ -12,6 +12,7 @@ import org.jftone.annotation.Configuration;
 import org.jftone.annotation.DataSource;
 import org.jftone.annotation.Resource;
 import org.jftone.component.BeanContext;
+import org.jftone.component.BeanInterceptor;
 import org.jftone.config.Const;
 import org.jftone.dao.Dao;
 import org.jftone.dao.DaoContext;
@@ -24,6 +25,9 @@ import org.jftone.util.IData;
 import org.jftone.util.ObjectUtil;
 import org.jftone.util.StringUtil;
 
+import net.sf.cglib.proxy.Enhancer;
+
+@SuppressWarnings("deprecation")
 abstract class BeanLoader {
 	private static Log log = LogFactory.getLog(BeanLoader.class);
 	
@@ -37,9 +41,38 @@ abstract class BeanLoader {
 	 * 解析bean，并实例化bean
 	 * @param beanClazz
 	 */
-	abstract <T> void parseClazz() throws ComponentException;
+	abstract <T> boolean parseClazz() throws ComponentException;
 	
-	abstract <T> T createBean(Class<T> beanClazz) throws ComponentException;
+	/**
+	 * 
+	 * @param beanClazz
+	 * @param setterPro
+	 * @return
+	 * @throws ComponentException
+	 */
+	@SuppressWarnings("unchecked")
+	<T> T createBean(Class<T> beanClazz, boolean setterPro) throws ComponentException {
+		//创建代理对象
+		Enhancer enhancer = new Enhancer();
+		enhancer.setSuperclass(beanClazz);
+		enhancer.setCallback(new BeanInterceptor<T>(beanClazz));
+		enhancer.setClassLoader(beanClazz.getClassLoader());
+		T componentObj = (T) enhancer.create();
+		if(setterPro){
+			//设置依赖属性
+			setProperty(beanClazz, componentObj);
+		}
+		return componentObj;
+	}
+	/**
+	 * 实例化Bean
+	 * @param beanClazz
+	 * @return
+	 * @throws ComponentException
+	 */
+	<T> T createBean(Class<T> beanClazz) throws ComponentException {
+		return createBean(beanClazz, true);
+	}
 	
 	/**
 	 * 根据属性注解注入组件依赖对象
@@ -120,7 +153,7 @@ abstract class BeanLoader {
 			className = fieldClazz.getName();
 			if(!BeanContext.hasBean(fieldClazz)) {
 				//如果依赖的Bean没有进行实例化解析，则需要校验类是否
-				BeanLoaderManager.doParseClazz(fieldClazz);	
+				BeanLoaderManager.doParseClazz(fieldClazz, true);	
 			}
 			Method method = beanClazz.getMethod(ObjectUtil.getSetter(field.getName()), fieldClazz);
 			method.invoke(serviceInstance, BeanContext.getBean(fieldClazz));
@@ -148,7 +181,7 @@ abstract class BeanLoader {
 			}
 			if(!BeanContext.hasBean(fieldClazz)) {
 				//如果依赖的Bean没有进行实例化解析，则需要校验类是否
-				BeanLoaderManager.doParseClazz(fieldClazz);	
+				BeanLoaderManager.doParseClazz(fieldClazz, true);	
 			}
 			field.setAccessible(true);
 			field.set(serviceInstance, BeanContext.getBean(fieldClazz));

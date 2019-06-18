@@ -2,11 +2,8 @@ package org.jftone.component.core;
 
 import org.jftone.annotation.Component;
 import org.jftone.component.BeanContext;
-import org.jftone.component.BeanInterceptor;
 import org.jftone.config.Const;
 import org.jftone.exception.ComponentException;
-
-import net.sf.cglib.proxy.Enhancer;
 
 class ComponentLoader extends BeanLoader {
 	
@@ -16,7 +13,8 @@ class ComponentLoader extends BeanLoader {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	<T> void parseClazz() throws ComponentException {
+	<T> boolean parseClazz() throws ComponentException {
+		boolean singleton = false;
 		final Class<T> clazz = (Class<T>)beanClazz;
 		//执行初始化方法
 		ComponentBody<T> ch = new ComponentBody<T>();
@@ -26,32 +24,14 @@ class ComponentLoader extends BeanLoader {
 		ch.setInitMethod(component.init());
 		ch.setDestroyMethod(component.destroy());
 		if(component.scope().equals(Const.SCOPE_SINGLETON)) {
-			T componentObj = createBean(clazz);
+			T componentObj = createBean(clazz, false);
 			ch.setInstance(componentObj);
+			singleton = true;
 		}else {
 			ch.setClazz(clazz);
 		}
 		BeanContext.setBean(clazz, ch);
+		return singleton;
 	}
 	
-	/**
-	 * 实例化Bean
-	 * @param beanClazz
-	 * @return
-	 * @throws ComponentException
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	<T> T createBean(Class<T> beanClazz) throws ComponentException {
-		//创建代理对象
-		Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass(beanClazz);
-		enhancer.setCallback(new BeanInterceptor<T>(beanClazz));
-		enhancer.setClassLoader(beanClazz.getClassLoader());
-		T componentObj = (T) enhancer.create();
-		//设置依赖属性
-		setProperty(beanClazz, componentObj);
-		return componentObj;
-	}
-
 }

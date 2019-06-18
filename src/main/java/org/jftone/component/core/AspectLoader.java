@@ -8,6 +8,7 @@ import org.jftone.aop.AspectAdvisor;
 import org.jftone.aop.CustomizedPointcut;
 import org.jftone.component.AspectContext;
 import org.jftone.component.BeanContext;
+import org.jftone.config.Const;
 import org.jftone.exception.ComponentException;
 import org.jftone.util.StringUtil;
 
@@ -19,7 +20,8 @@ class AspectLoader extends BeanLoader {
 	}
 
 	@Override
-	void parseClazz() throws ComponentException {
+	@SuppressWarnings("unchecked")
+	<T> boolean parseClazz() throws ComponentException {
 		String beanName = beanClazz.getName();
 		if (!AspectAdvisor.class.isAssignableFrom(beanClazz)) {
 			throw new ClassCastException(beanName+"注解Aspect的类必须实现BaseAspect接口");
@@ -42,20 +44,25 @@ class AspectLoader extends BeanLoader {
 		cp.setAllowAnyClass(AopUtil.allowAll(classNames));			//是否允许所有代理类
 		cp.setAllowAnyMethod(AopUtil.allowAll(methodNames));		//是否允许所有代理类方法
 		try {
+			//初始化对象，所有AOP拦截皆为单例
+			final Class<T> clazz = (Class<T>)beanClazz;
+			T serviceObj = createBean(clazz, false);
+			ComponentBody<T> ch = new ComponentBody<T>();
+			ch.setName(beanName);
+			ch.setScope(Const.SCOPE_SINGLETON);
+			ch.setInstance(serviceObj);
+			BeanContext.setBean(clazz, ch);
+			
 			// 实例化AOP通知对象，AOP对象也属于容器管理
-			AspectAdvisor aspectAdvisor = (AspectAdvisor) BeanContext.getBean(beanClazz);
+			AspectAdvisor aspectAdvisor = (AspectAdvisor) serviceObj;
 			aspectAdvisor.setAdviseIndicator(AopUtil.parseAdviseIndicator(beanClazz.getDeclaredMethods()));
 			cp.setAspectAdvisor(aspectAdvisor);
+			
 		} catch (Exception e) {
 			log.error("实例化[" + beanName + "]错误，必须是public类型无参构造函数", e);
 			throw new ComponentException("实例化[" + beanClazz.getName() + "]错误，必须是public类型无参构造函数", e);
 		}
 		AspectContext.add(cp);
+		return true;
 	}
-
-	@Override
-	<T> T createBean(Class<T> beanClazz) {
-		return null;
-	}
-	
 }

@@ -1,8 +1,5 @@
 package org.jftone.component.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jftone.annotation.Aspect;
 import org.jftone.annotation.Component;
 import org.jftone.annotation.Controller;
@@ -11,7 +8,6 @@ import org.jftone.component.BeanContext;
 import org.jftone.exception.ComponentException;
 
 public final class BeanLoaderManager {
-	private static final int ANNOTATION_NUM = 6;
 	private BeanLoaderManager(){
 		super();
 	}
@@ -22,28 +18,24 @@ public final class BeanLoaderManager {
 	 * @return
 	 * @throws ComponentException
 	 */
-	private static <T> List<BeanLoader> getBeanLoader(Class<T> beanClazz, boolean checkAopAdvisor) throws ComponentException {
+	private static <T> BeanLoader getBeanLoader(Class<T> beanClazz) throws ComponentException {
 		if(null == beanClazz || beanClazz.getDeclaredAnnotations().length<1) {
 			throw new ComponentException("Class["+beanClazz.getName()+"]没有设置注解");
 		}
-		List<BeanLoader> beanLoaders = new ArrayList<>(ANNOTATION_NUM);
+		BeanLoader beanLoader = null;
 		if(beanClazz.isAnnotationPresent(Component.class)) {
-			beanLoaders.add(BeanLoaderFactory.getBeanLoader(Component.class, beanClazz));
+			beanLoader = BeanLoaderFactory.getBeanLoader(Component.class, beanClazz);
 		}else if(beanClazz.isAnnotationPresent(Service.class)) {
-			beanLoaders.add(BeanLoaderFactory.getBeanLoader(Service.class, beanClazz));
+			beanLoader = BeanLoaderFactory.getBeanLoader(Service.class, beanClazz);
 		}else if(beanClazz.isAnnotationPresent(Controller.class)) {
-			beanLoaders.add(BeanLoaderFactory.getBeanLoader(Controller.class, beanClazz));
+			beanLoader = BeanLoaderFactory.getBeanLoader(Controller.class, beanClazz);
+		}else if(beanClazz.isAnnotationPresent(Aspect.class)) {
+			beanLoader = BeanLoaderFactory.getBeanLoader(Aspect.class, beanClazz);
 		}
-		if(checkAopAdvisor && beanClazz.isAnnotationPresent(Aspect.class)) {
-			beanLoaders.add(BeanLoaderFactory.getBeanLoader(Aspect.class, beanClazz));
-		}
-		if(beanLoaders.isEmpty()) {
+		if(null == beanLoader) {
 			throw new ComponentException("Class["+beanClazz.getName()+"]类注解不支持");
 		}
-		return beanLoaders;
-	}
-	private static <T> BeanLoader getBeanLoader(Class<T> beanClazz) throws ComponentException {
-		return getBeanLoader(beanClazz, false).get(0);
+		return beanLoader;
 	}
 	
 	/**
@@ -51,15 +43,17 @@ public final class BeanLoaderManager {
 	 * @param beanClazz
 	 * @throws ComponentException
 	 */
-	public static <T> void doParseClazz(Class<T> beanClazz) throws ComponentException {
-		//如果已经初始化，则直接返回
+	public static <T> boolean doParseClazz(Class<T> beanClazz) throws ComponentException {
+		return doParseClazz(beanClazz, false);
+	}
+	
+	public static <T> boolean doParseClazz(Class<T> beanClazz, boolean setter) throws ComponentException {
+		//如果已经初始化，则按照非单例模式，直接返回
 		if(BeanContext.hasBean(beanClazz)) {
-			return;
+			return false;
 		}
-		List<BeanLoader> beanLoaders = getBeanLoader(beanClazz, true);
-		for(BeanLoader bl : beanLoaders) {
-			bl.parseClazz();
-		}
+		BeanLoader beanLoaders = getBeanLoader(beanClazz);
+		return beanLoaders.parseClazz();
 	}
 	
 	/**

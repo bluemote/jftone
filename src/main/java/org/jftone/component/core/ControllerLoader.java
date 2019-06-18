@@ -12,17 +12,13 @@ class ControllerLoader extends BeanLoader {
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	<T> void parseClazz() {
+	<T> boolean parseClazz() {
 		if(!Action.class.isAssignableFrom(beanClazz)) {
 			throw new ClassCastException("Controlller注解只能配置在Action类上");
 		}
 		Controller controller = beanClazz.getAnnotation(Controller.class);
 		ControllerContext.set(controller.mapping(), (Class<? extends Action>)beanClazz);
-	}
-	
-	@Override
-	<T> T createBean(Class<T> beanClazz) {
-		return null;
+		return false;
 	}
 
 }

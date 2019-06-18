@@ -29,9 +29,6 @@ public class BeanInterceptor<T> implements MethodInterceptor {
 		Object result = null;
 		List<AopInterceptor> interceptorChain = null;
 		try {
-			if(log.isDebugEnabled()) {
-				log.debug("进入AOP拦截调用" + beanClass.getName() + "." + method.getName());
-			}
 			if(AopUtil.isSetDaoMethod(method)) {
 				return methodProxy.invokeSuper(proxy, params);
 			}
@@ -39,14 +36,17 @@ public class BeanInterceptor<T> implements MethodInterceptor {
 			interceptorChain = factory.getInterceptor(proxy, method, params, beanClass);
 			if (null == interceptorChain || interceptorChain.isEmpty()) {
 				return methodProxy.invokeSuper(proxy, params);
-			} 
+			}
+			if(log.isDebugEnabled()) {
+				log.debug("进入AOP拦截调用:" + beanClass.getName() + "." + method.getName());
+			}
 			MethodInvocation methodInvocation = new MethodInvocation(proxy, method, params, methodProxy,
 					this.beanClass, interceptorChain);
 			result = methodInvocation.proceed();
 			
 		} catch (Throwable e) {
 			log.error("执行" + beanClass.getName() + "." + method.getName() + "错误", e);
-			throw new ServiceException(e);
+			throw new ServiceException("执行" + beanClass.getName() + "." + method.getName() + "错误", e);
 		} finally {
 			if(null != interceptorChain) {
 				interceptorChain.clear();

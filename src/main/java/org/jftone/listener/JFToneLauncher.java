@@ -101,19 +101,22 @@ public class JFToneLauncher {
 		try {
 			String appListener = PropertyConfigurer.get(PropertyConfigurer.LISTENE_INTERFACE);
 			if(null != appListener && !appListener.equals("")){
+				log.error("释放应用业务配置......");
 				@SuppressWarnings("unchecked")
 				Class<AppListener> appIntfCls =  (Class<AppListener>)Class.forName(appListener);
 				appIntfCls.newInstance().destroy();
 			}
-			
-			DataSourceContext.destroyed();
-			DBRepository.destroyed();
-			
+			log.error("释放应用其他配置......");
 			//关闭注销Bean
 			BeanContext.close();
+			
 			//注销配置映射
 			PropertyConfigurer.destroyed();
 			
+			DBRepository.destroyed();
+			DataSourceContext.destroyed();
+			
+			log.error("应用注销完成......");
 		} catch (Exception ex) {
 			log.error("应用注销错误", ex);
 		}
