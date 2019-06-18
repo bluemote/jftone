@@ -90,11 +90,11 @@ public final class OKHttpUtil {
 	}
 	
 	public static OKHttpUtil getCookieInstance() {
-		return getInstance(0, false, null);
+		return getInstance(0, true, null);
 	}
 
 	public static OKHttpUtil getCookieInstance(int timeout) {
-		return getInstance(timeout, false, null);
+		return getInstance(timeout, true, null);
 	}
 	
 	public static OKHttpUtil getProxyInstance(String host, int port) {
@@ -127,8 +127,8 @@ public final class OKHttpUtil {
 		return sendRequest(createHttpGet(httpUrl));
 	}
 
-	public String sendGetRequest(String httpUrl, IData<String, Object> hearderData) throws IOException {
-		return sendRequest(createHttpGet(httpUrl, hearderData));
+	public String sendGetRequest(String httpUrl, IData<String, Object> headerData) throws IOException {
+		return sendRequest(createHttpGet(httpUrl, headerData));
 	}
 
 	/**
@@ -143,18 +143,18 @@ public final class OKHttpUtil {
 		return sendRequest(createPostRequest(httpUrl, postStr));
 	}
 
-	public String sendPostRequest(String httpUrl, String postStr, IData<String, Object> hearderData)
+	public String sendPostRequest(String httpUrl, String postStr, IData<String, Object> headerData)
 			throws IOException {
-		return sendRequest(createPostRequest(httpUrl, postStr, hearderData));
+		return sendRequest(createPostRequest(httpUrl, postStr, headerData));
 	}
 
 	public String sendPostRequest(String httpUrl, String postStr, String contentType) throws IOException {
 		return sendRequest(createPostRequest(httpUrl, postStr, contentType));
 	}
 
-	public String sendPostRequest(String httpUrl, String postStr, IData<String, Object> hearderData, String contentType)
+	public String sendPostRequest(String httpUrl, String postStr, IData<String, Object> headerData, String contentType)
 			throws IOException {
-		return sendRequest(createPostRequest(httpUrl, postStr, hearderData, contentType));
+		return sendRequest(createPostRequest(httpUrl, postStr, headerData, contentType));
 	}
 
 	/**
@@ -170,16 +170,16 @@ public final class OKHttpUtil {
 		return createPostRequest(httpUrl, postStr, null, null);
 	}
 
-	public Request createPostRequest(String httpUrl, String postStr, IData<String, Object> hearderData)
+	public Request createPostRequest(String httpUrl, String postStr, IData<String, Object> headerData)
 			throws IOException {
-		return createPostRequest(httpUrl, postStr, hearderData, null);
+		return createPostRequest(httpUrl, postStr, headerData, null);
 	}
 
 	public Request createPostRequest(String httpUrl, String postStr, String contentType) throws IOException {
 		return createPostRequest(httpUrl, postStr, null, contentType);
 	}
 
-	public Request createPostRequest(String httpUrl, String postStr, IData<String, Object> hearderData,
+	public Request createPostRequest(String httpUrl, String postStr, IData<String, Object> headerData,
 			String contentType) throws IOException {
 		if (null == contentType) {
 			contentType = OKHttpUtil.CONTENT_TEXT;
@@ -188,8 +188,8 @@ public final class OKHttpUtil {
 		Request.Builder reqBuilder = new Request.Builder();
 		reqBuilder.url(httpUrl);
 		reqBuilder.post(body);
-		if (null != hearderData && !hearderData.isEmpty()) {
-			Headers headers = getHeaders(hearderData);
+		if (null != headerData && !headerData.isEmpty()) {
+			Headers headers = getHeaders(headerData);
 			if (null != headers) {
 				reqBuilder.headers(headers);
 			}
@@ -212,15 +212,15 @@ public final class OKHttpUtil {
 	 * 创建HTTP GET请求，同时设置header参数
 	 * 
 	 * @param httpUrl
-	 * @param hearderData
+	 * @param headerData
 	 * @return
 	 * @throws IOException
 	 */
-	public Request createHttpGet(String httpUrl, IData<String, Object> hearderData) throws IOException {
+	public Request createHttpGet(String httpUrl, IData<String, Object> headerData) throws IOException {
 		Request.Builder reqBuilder = new Request.Builder();
 		reqBuilder.url(httpUrl);
-		if (null != hearderData && !hearderData.isEmpty()) {
-			Headers headers = getHeaders(hearderData);
+		if (null != headerData && !headerData.isEmpty()) {
+			Headers headers = getHeaders(headerData);
 			if (null != headers) {
 				reqBuilder.headers(headers);
 			}
@@ -247,14 +247,14 @@ public final class OKHttpUtil {
 	 * @param httpUrl
 	 * @param paramData
 	 *            表单提交参数
-	 * @param hearderData
+	 * @param headerData
 	 *            header参数
 	 * @return
 	 * @throws IOException
 	 */
-	public String sendFormPost(String httpUrl, IData<String, Object> paramData, IData<String, Object> hearderData)
+	public String sendFormPost(String httpUrl, IData<String, Object> paramData, IData<String, Object> headerData)
 			throws IOException {
-		return sendRequest(createFormPost(httpUrl, paramData, hearderData));
+		return sendRequest(createFormPost(httpUrl, paramData, headerData));
 	}
 
 	/**
@@ -297,7 +297,7 @@ public final class OKHttpUtil {
 		return createFormPost(httpUrl, paramData, null);
 	}
 
-	public Request createFormPost(String httpUrl, IData<String, Object> paramData, IData<String, Object> hearderData)
+	public Request createFormPost(String httpUrl, IData<String, Object> paramData, IData<String, Object> headerData)
 			throws IOException {
 		Request.Builder reqBuilder = new Request.Builder();
 		reqBuilder.url(httpUrl);
@@ -308,8 +308,8 @@ public final class OKHttpUtil {
 			}
 			reqBuilder.post(fbBuilder.build());
 		}
-		if (null != hearderData && !hearderData.isEmpty()) {
-			Headers headers = getHeaders(hearderData);
+		if (null != headerData && !headerData.isEmpty()) {
+			Headers headers = getHeaders(headerData);
 			if (null != headers) {
 				reqBuilder.headers(headers);
 			}
@@ -319,14 +319,14 @@ public final class OKHttpUtil {
 
 	/**
 	 * 
-	 * @param hearderData
+	 * @param headerData
 	 * @return
 	 */
-	protected Headers getHeaders(IData<String, Object> hearderData) {
+	protected Headers getHeaders(IData<String, Object> headerData) {
 		Headers headers = null;
-		if (null != hearderData && !hearderData.isEmpty()) {
+		if (null != headerData && !headerData.isEmpty()) {
 			Headers.Builder hb = new Headers.Builder();
-			for (Map.Entry<String, Object> header : hearderData.entrySet()) {
+			for (Map.Entry<String, Object> header : headerData.entrySet()) {
 				hb.set(header.getKey(), header.getValue().toString());
 			}
 			headers = hb.build();
@@ -447,5 +447,4 @@ public final class OKHttpUtil {
 		 */
 		public void onResponse(Response response) throws IOException;
 	}
-
 }
