@@ -19,8 +19,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.config.Const;
 import org.jftone.exception.ActionException;
 import org.jftone.jdbc.DBRepository;
@@ -31,7 +31,7 @@ import org.jftone.jdbc.TableStructure;
 import org.jftone.util.ClassUtil;
 
 public class OrmConfigLoad {
-	private Log log = LogFactory.getLog(OrmConfigLoad.class);
+	private Logger log = LoggerFactory.getLogger(OrmConfigLoad.class);
 	
 	public void scanModel(String packageName) throws Exception{
 		String[] pkgNames = null;

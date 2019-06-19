@@ -20,8 +20,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.action.render.Render;
 import org.jftone.action.render.RenderFactory;
 import org.jftone.config.Const;
@@ -38,7 +38,7 @@ import com.esotericsoftware.reflectasm.MethodAccess;
  *
  */
 public class ActionSupport implements Action {
-	private Log log = LogFactory.getLog(ActionSupport.class);
+	private Logger log = LoggerFactory.getLogger(ActionSupport.class);
 	private MessageResource messageResource;
 	private HttpServletRequest request;
 	private HttpServletResponse response;

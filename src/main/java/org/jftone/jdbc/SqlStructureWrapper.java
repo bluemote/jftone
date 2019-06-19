@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.exception.DbException;
 import org.jftone.util.StringUtil;
 
 public class SqlStructureWrapper {
-	private Log log = LogFactory.getLog(SqlStructureWrapper.class);
+	private Logger log = LoggerFactory.getLogger(SqlStructureWrapper.class);
 
 	private SqlStructure sqlStructure;
 	

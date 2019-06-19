@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.component.ControllerContext;
 import org.jftone.config.ActionInterceptor;
 import org.jftone.config.AppConfig;
@@ -26,7 +26,7 @@ import org.jftone.config.Route;
 import org.jftone.exception.ActionException;
 
 final class ActionContext {
-	private Log log = LogFactory.getLog(ActionContext.class);
+	private Logger log = LoggerFactory.getLogger(ActionContext.class);
 	private final String LINE = "/";
 	
 	private Map<String, ActionMapping> actionMapping = new HashMap<String, ActionMapping>();

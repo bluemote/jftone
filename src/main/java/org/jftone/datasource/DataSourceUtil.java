@@ -3,12 +3,12 @@ package org.jftone.datasource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.transaction.TransactionSynchronizationManager;
 
 public final class DataSourceUtil {
-	private static Log log = LogFactory.getLog(DataSourceUtil.class);
+	private static Logger log = LoggerFactory.getLogger(DataSourceUtil.class);
 
 	public static Connection getConnection(String routeDataSourceKey) {
 		try {

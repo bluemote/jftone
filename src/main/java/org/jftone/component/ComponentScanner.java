@@ -11,8 +11,8 @@ package org.jftone.component;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.annotation.Aspect;
 import org.jftone.annotation.Component;
 import org.jftone.annotation.Controller;
@@ -23,7 +23,7 @@ import org.jftone.exception.ComponentException;
 import org.jftone.util.ClassUtil;
 
 public final class ComponentScanner {
-	private Log log = LogFactory.getLog(ComponentScanner.class);
+	private Logger log = LoggerFactory.getLogger(ComponentScanner.class);
 	
 	private List<Class<?>> beanClazzs = new ArrayList<>();
 	private List<Class<?>> aopClazzs = new ArrayList<>();

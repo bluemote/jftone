@@ -17,8 +17,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.annotation.Controller;
 import org.jftone.component.ControllerContext;
 import org.jftone.config.ActionInterceptor;
@@ -30,7 +30,7 @@ import org.jftone.exception.ActionException;
  */
 final class ActionHandler {
 
-	private Log log = LogFactory.getLog(ActionHandler.class);
+	private Logger log = LoggerFactory.getLogger(ActionHandler.class);
 
 	public static final String ACTION_INTERCEPTOR = "ACTION_INTERCEPTOR";
 	public static final String ACTION_RESOURCE = "ACTION_RESOURCE";

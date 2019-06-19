@@ -5,8 +5,8 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.annotation.Component;
 import org.jftone.config.PropertyConfigurer;
 import org.jftone.data.CacheException;
@@ -20,7 +20,7 @@ import net.rubyeye.xmemcached.XMemcachedClientBuilder;
 
 @Component(init="init", destroy="destroy")
 public class MemcacheService {
-	private Log log = LogFactory.getLog(MemcacheService.class);
+	private Logger log = LoggerFactory.getLogger(MemcacheService.class);
 	
 	private MemcachedClient client = null;
 		

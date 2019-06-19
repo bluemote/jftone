@@ -11,8 +11,8 @@ package org.jftone.code;
 import java.io.File;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -30,7 +30,7 @@ import org.jftone.util.StringUtil;
  * 
  */
 public class SqlConfigLoad {
-	private Log log = LogFactory.getLog(SqlConfigLoad.class);
+	private Logger log = LoggerFactory.getLogger(SqlConfigLoad.class);
 	public static final String SQL_CONFIG_FILE = "sql-config.xml";
 
 	/**

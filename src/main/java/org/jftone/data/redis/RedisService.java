@@ -3,8 +3,8 @@ package org.jftone.data.redis;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.annotation.Component;
 import org.jftone.config.PropertyConfigurer;
 import org.jftone.data.CacheException;
@@ -18,7 +18,7 @@ import redis.clients.jedis.ShardedJedisPool;
 
 @Component(init="init", destroy="destroy")
 public class RedisService {
-	private Log log = LogFactory.getLog(RedisService.class);
+	private Logger log = LoggerFactory.getLogger(RedisService.class);
 	
 	private ShardedJedisPool pool = null;
 	

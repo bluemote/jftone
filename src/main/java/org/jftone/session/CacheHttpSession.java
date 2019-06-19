@@ -11,7 +11,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.data.CacheException;
 import org.jftone.data.CacheTemplate;
 import org.jftone.util.DateUtil;
@@ -19,7 +20,7 @@ import org.jftone.util.StringUtil;
 
 @SuppressWarnings("deprecation")
 class CacheHttpSession implements HttpSession {
-	Logger log = Logger.getLogger(CacheHttpSession.class);
+	private Logger log = LoggerFactory.getLogger(CacheHttpSession.class);
 	
     public static int TIMEOUT = 1800;
 

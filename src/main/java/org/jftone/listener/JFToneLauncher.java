@@ -3,14 +3,14 @@ package org.jftone.listener;
 import java.io.FileNotFoundException;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.code.OrmConfigLoad;
 import org.jftone.code.SqlConfigLoad;
 import org.jftone.component.BeanContext;
 import org.jftone.component.ComponentScanner;
-import org.jftone.config.PropertyConfigurer;
 import org.jftone.config.AppListener;
+import org.jftone.config.PropertyConfigurer;
 import org.jftone.datasource.DataSourceContext;
 import org.jftone.datasource.DataSourceLoad;
 import org.jftone.jdbc.DBRepository;
@@ -19,7 +19,7 @@ import org.jftone.util.FileUtil;
 import org.jftone.util.StringUtil;
 
 public class JFToneLauncher {
-	private static Log log = LogFactory.getLog(JFToneLauncher.class);
+	private static Logger log = LoggerFactory.getLogger(JFToneLauncher.class);
 
 	private static final String DATASOURCE_CONFIG = "jdbc.properties";
 	

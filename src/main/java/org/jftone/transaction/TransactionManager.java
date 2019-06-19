@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.annotation.Transactional;
 import org.jftone.aop.AopUtil;
 import org.jftone.aop.TransactionalPointcut;
@@ -22,7 +22,7 @@ import org.jftone.datasource.DataSourceUtil;
 import org.jftone.util.StringUtil;
 
 public class TransactionManager {
-	private static Log log = LogFactory.getLog(TransactionManager.class);
+	private static Logger log = LoggerFactory.getLogger(TransactionManager.class);
 
 	private TransactionManager() {
 		super();

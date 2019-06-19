@@ -3,8 +3,8 @@ package org.jftone.component;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.aop.AopInterceptor;
 import org.jftone.aop.AopUtil;
 import org.jftone.aop.InterceptorFactory;
@@ -15,7 +15,7 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
 public class BeanInterceptor<T> implements MethodInterceptor {
-	private Log log = LogFactory.getLog(BeanInterceptor.class);
+	private Logger log = LoggerFactory.getLogger(BeanInterceptor.class);
 
 	private Class<T> beanClass;
 

@@ -12,8 +12,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.config.Const;
 import org.jftone.datasource.DataSourceUtil;
 import org.jftone.datasource.RouteDataSource;
@@ -36,7 +36,7 @@ import org.jftone.util.ObjectUtil;
 import org.jftone.util.Page;
 
 public final class Dao {
-	private Log log = LogFactory.getLog(Dao.class);
+	private Logger log = LoggerFactory.getLogger(Dao.class);
 	
 	private RouteDataSource datasource;
 	

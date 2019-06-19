@@ -12,8 +12,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.exception.DaoException;
 import org.jftone.jdbc.DataType;
 import org.jftone.jdbc.JdbcType;
@@ -21,7 +21,7 @@ import org.jftone.util.DataMap;
 import org.jftone.util.IData;
 
 public final class DaoUtil {
-	private static Log log = LogFactory.getLog(DaoUtil.class);
+	private static Logger log = LoggerFactory.getLogger(DaoUtil.class);
 	
 	/**
 	 * 设置Data类型数据

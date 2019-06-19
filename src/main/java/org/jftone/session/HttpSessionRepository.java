@@ -3,8 +3,8 @@ package org.jftone.session;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.component.BeanContext;
 import org.jftone.config.PropertyConfigurer;
 import org.jftone.data.CacheTemplate;
@@ -14,7 +14,7 @@ import org.jftone.exception.ComponentException;
 import org.jftone.util.StringUtil;
 
 public final class HttpSessionRepository {
-	private Log log = LogFactory.getLog(HttpSessionRepository.class);
+	private Logger log = LoggerFactory.getLogger(HttpSessionRepository.class);
 	
 	public static final String SID_TOKEN = "JFT-AUTH-TOKEN";
 	public static String SESSION_ID = "JFTID";

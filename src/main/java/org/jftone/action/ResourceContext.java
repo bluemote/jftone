@@ -15,8 +15,8 @@ import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.config.Const;
 
 /**
@@ -25,7 +25,7 @@ import org.jftone.config.Const;
  */
 final class ResourceContext {
 	
-	private Log log = LogFactory.getLog(ResourceContext.class);
+	private Logger log = LoggerFactory.getLogger(ResourceContext.class);
 	//本地化对象
 	private Locale local = Locale.getDefault();
 	//存放本地资源束

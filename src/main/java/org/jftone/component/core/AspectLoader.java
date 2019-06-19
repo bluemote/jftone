@@ -1,7 +1,7 @@
 package org.jftone.component.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.annotation.Aspect;
 import org.jftone.aop.AopUtil;
 import org.jftone.aop.AspectAdvisor;
@@ -13,7 +13,7 @@ import org.jftone.exception.ComponentException;
 import org.jftone.util.StringUtil;
 
 class AspectLoader extends BeanLoader {
-	private static Log log = LogFactory.getLog(AspectLoader.class);
+	private Logger log = LoggerFactory.getLogger(AspectLoader.class);
 
 	<T> AspectLoader(Class<T> beanClazz) {
 		super(beanClazz);

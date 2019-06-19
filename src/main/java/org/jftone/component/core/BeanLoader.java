@@ -5,8 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.annotation.Autowired;
 import org.jftone.annotation.Configuration;
 import org.jftone.annotation.DataSource;
@@ -29,7 +29,7 @@ import net.sf.cglib.proxy.Enhancer;
 
 @SuppressWarnings("deprecation")
 abstract class BeanLoader {
-	private static Log log = LogFactory.getLog(BeanLoader.class);
+	private Logger log = LoggerFactory.getLogger(BeanLoader.class);
 	
 	protected Class<?> beanClazz;
 	

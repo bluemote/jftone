@@ -20,8 +20,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.config.Const;
 import org.jftone.config.PropertyConfigurer;
 import org.jftone.exception.ActionException;
@@ -36,7 +36,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 public class CodeGenerate {
-	private Log log = LogFactory.getLog(CodeGenerate.class);
+	private Logger log = LoggerFactory.getLogger(CodeGenerate.class);
 	
 	private String entityVM = "Model.tpl";
 	

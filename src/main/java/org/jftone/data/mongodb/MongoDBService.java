@@ -2,8 +2,8 @@ package org.jftone.data.mongodb;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.annotation.Component;
 import org.jftone.config.PropertyConfigurer;
 import org.jftone.util.FileUtil;
@@ -18,7 +18,7 @@ import com.mongodb.client.MongoDatabase;
 
 @Component(init="init", destroy="destroy")
 public class MongoDBService {
-	private static Log log = LogFactory.getLog(MongoDBService.class);
+	private static Logger log = LoggerFactory.getLogger(MongoDBService.class);
 
 	private MongoClient mongoClient;
 	private String databaseName;

@@ -12,7 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -29,7 +30,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public final class OKHttpUtil {
-	private static Logger log = Logger.getLogger(OKHttpUtil.class);
+	private static Logger log = LoggerFactory.getLogger(OKHttpUtil.class);
 	private Proxy proxy = null;
 	private int timeout = 30;			//超时时间
 	private OkHttpClient okHttpClient = null;

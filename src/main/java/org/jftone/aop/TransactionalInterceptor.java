@@ -3,14 +3,14 @@ package org.jftone.aop;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.exception.ServiceException;
 import org.jftone.transaction.TransactionManager;
 import org.jftone.transaction.TransactionStatus;
 
 public final class TransactionalInterceptor implements AopInterceptor {
-	private Log log = LogFactory.getLog(TransactionalInterceptor.class);
+	private Logger log = LoggerFactory.getLogger(TransactionalInterceptor.class);
 	
 	private Class<?> beanClass;
 	

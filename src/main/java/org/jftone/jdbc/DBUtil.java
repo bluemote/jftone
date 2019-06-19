@@ -15,8 +15,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.exception.DbException;
 import org.jftone.jdbc.handler.ResultSetHandler;
 
@@ -24,7 +24,7 @@ import net.sf.json.JSONArray;
 
 
 public class DBUtil {
-	private static Log log = LogFactory.getLog(DBUtil.class);
+	private static Logger log = LoggerFactory.getLogger(DBUtil.class);
 
 	private DBUtil() {
 		super();

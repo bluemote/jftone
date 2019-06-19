@@ -10,11 +10,9 @@ package org.jftone.jdbc;
 
 import java.sql.ResultSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.exception.DbException;
-import org.jftone.jdbc.DBScan;
-import org.jftone.jdbc.DBUtil;
 import org.jftone.jdbc.handler.ResultSetHandler;
 import org.jftone.util.DataMap;
 import org.jftone.util.IData;
@@ -22,7 +20,7 @@ import org.jftone.util.ObjectUtil;
 
 public class DBScanMySql extends DBScan {
 	
-	private Log log = LogFactory.getLog(DBScanMySql.class);
+	private Logger log = LoggerFactory.getLogger(DBScanMySql.class);
 	
 	/**
 	 * 扫描书库表并存放到数据库表映射内存

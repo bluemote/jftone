@@ -13,7 +13,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jftone.action.render.RenderFactory;
 import org.jftone.config.Const;
 import org.jftone.config.PropertyConfigurer;
@@ -22,7 +23,7 @@ import org.jftone.session.HttpServletRespWrapper;
 import org.jftone.session.HttpSessionRepository;
 
 public final class JFToneFilter implements Filter {
-	Logger log = Logger.getLogger(JFToneFilter.class);
+	private Logger log = LoggerFactory.getLogger(JFToneFilter.class);
 	protected ServletContext context;
 	private ActionHandler handler;
 	private int contextPathLen;
