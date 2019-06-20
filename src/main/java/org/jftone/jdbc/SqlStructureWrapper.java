@@ -86,7 +86,7 @@ public class SqlStructureWrapper {
 			if(params.length>1 && !"".equals(params[1])){
 				jdbcType = DataType.getJdbcType(params[1]);		//参数中传入的
 			}else{
-				Class<?> paraTypeClazz = paramData.get(params[0].toUpperCase()).getClass();
+				Class<?> paraTypeClazz = paramData.get(params[0]).getClass();
 				jdbcType = DataType.getJdbcType(paraTypeClazz);
 			}
 			paramTypes.add(jdbcType);
