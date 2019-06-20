@@ -48,7 +48,7 @@
 	</distributionManagement>
 	<properties>
 		<encoding>UTF-8</encoding>
-		<repository.url>http://192.168.1.253:8081/repository</repository.url>
+		<repository.url>http://xxx.xxx.xxx.xxx:xxxx/repository</repository.url>
 		<jdk.version>1.7</jdk.version>
 		<servlet.version>3.1.0</servlet.version>
 		<log4j2.version>2.11.2</log4j2.version>
@@ -104,18 +104,11 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
-		<!-- commons-logging -->
 		<dependency>  
         	<groupId>org.slf4j</groupId>  
         	<artifactId>jcl-over-slf4j</artifactId>  
         	<version>${slf4j.version}</version>  
         	<scope>runtime</scope>  
-		</dependency>
-		<!-- system.err -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
 		</dependency>
 		<!--核心log4j2jar包-->
 		<dependency>
@@ -141,7 +134,6 @@
 			<version>${log4j2.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		
 		<dependency>
 			<groupId>com.googlecode.xmemcached</groupId>
 			<artifactId>xmemcached</artifactId>
