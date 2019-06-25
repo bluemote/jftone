@@ -5,7 +5,7 @@ Jftone是一套集成的后台框架
 1.1.1	web.xml配置
 	listener标签：
 <listener>
-	<listener-class>com.lezu.jftone.listener.JFToneListener</listener-class>
+	<listener-class>org.jftone.listener.JFToneListener</listener-class>
 </listener>
 
 JFToneListener为应用启动时候加载JFTone框架类
@@ -15,24 +15,24 @@ JFToneListener为应用启动时候加载JFTone框架类
 param-name固定为：appConfig
 param-value 请按照实际情况配置，默认为：web.properties，文件请配置在classes根目录下。
 <context-param>
-		<param-name>appConfig</param-name>
-		<param-value>web.properties</param-value>
+	<param-name>appConfig</param-name>
+	<param-value>jftone.properties</param-value>
 </context-param>
 
 appConfig为应用启动时候JFToneListener加载配置文件，相关参数将在后面说明
 
 
 	filter标签
-filter-class为固定值：com.lezu.jftone.action.JFToneFilter
+filter-class为固定值：org.jftone.action.JFToneFilter
 param-name为固定值：config
 其他标签请根据实际情况配置
 
 <filter>
     <filter-name>JFToneFilter</filter-name>
-    <filter-class>com.lezu.jftone.action.JFToneFilter</filter-class>
+    <filter-class>org.jftone.action.JFToneFilter</filter-class>
     <init-param>
 		<param-name>config</param-name>
-		<param-value>com.lezu.xxxx.config.BaseConfig</param-value>
+		<param-value>com.xxxx.xxxx.config.BaseConfig</param-value>
     </init-param>
 </filter>
 <filter-mapping>
@@ -141,37 +141,41 @@ slave.weight=4:3
 
 
 1.1.4	缓存文件配置
-	Memcache配置文件（memcache-config.xml）
+Memcache配置文件（memcache-config.xml）
 <?xml version="1.0" encoding="UTF-8"?>
-<cache>
-    <config name="poolSize">5</config>
-    <config name="timeout">1</config>
+<jftone>
+    <poolSize>5</poolSize>
+    <timeout>1</timeout>
+    <hosts>	
 	<host>
-  		<item name="ip">localhost</item>
-  		<item name="port">11211</item>
-  		<item name="weight">1</item>
+  		<ip>localhost</ip>
+  		<port>11211</port>
+  		<weight>1</weight>
   	</host>
-</cache>
+   </hosts>	
+</jftone>
 
 
-	Redis配置文件（redis-config.xml）
+Redis配置文件（redis-config.xml）
 <?xml version="1.0" encoding="UTF-8"?>
-<cache>
+<jftone>
 <!-- 最大活动的对象个数 -->
-<config name="maxTotal">500</config>
+    <maxTotal>500</maxTotal>
 <!-- 对象最大空闲时间 -->
-<config name="maxIdle">100</config>
+    <maxIdle>100</maxIdle>
 <!-- 获取对象时最大等待时间 -->
-<config name="minIdle">10</config>	
+    <minIdle>10</minIdle>	
 <!-- 等待时间 -->
-    <config name="maxWait">3</config>
+    <maxWait>3</maxWait>
+    <hosts>
 	<host>
-  		<item name="ip">localhost</item>
-  		<item name="port">6379</item>
-  		<item name="auth">passwd</item>
-  		<item name="weight">1</item>
+  		<ip>localhost</ip>
+  		<port>6379</port>
+  		<auth>passwd</auth>
+  		<weight>1</weight>
   	</host>
-</cache>
+    </hosts>
+</jftone>
 
 
 
@@ -250,8 +254,6 @@ after：action方法执行后调用
 throwable：action方法抛错调用
 
 
-
-
 1.2.2	应用启动侦听
 web.properties配置中listenService配置类，必须AppListener接口
 该实现类，主要完成随应用启动过程需要加载的初始化装载，相关数据缓存，服务启动，应用环境自检等。
@@ -281,26 +283,25 @@ web.properties配置中如urlPartern=do
 此时，两种访问路径都支持，如果没有配置项urlPartern，则仅支持第一种伪静态访问路径
 
 Action开发规范：
-	必须继承com.lezu.jftone.action.ActionSupport
-	所有对外开放方法必须设置为public，且为无参非静态方法，原则上统一抛出异常ActionException
-	getRequest()  获取 HttpServletRequest对象
-	getResponse()  获取 HttpServletResponse对象
-	getData()   返回IData接口，内部包含了通过request.getParamter获取的所有请求参数，实际开发，请直接使用该方法获取参数，不需要从
-getRequest().getParamter(“参数名”)拿参数值
+必须继承com.lezu.jftone.action.ActionSupport
+所有对外开放方法必须设置为public，且为无参非静态方法，原则上统一抛出异常ActionException
+getRequest()  获取 HttpServletRequest对象
+getResponse()  获取 HttpServletResponse对象
+getData()   返回IData接口，内部包含了通过request.getParamter获取的所有请求参数，实际开发，请直接使用该方法获取参数，不需要从getRequest().getParamter(“参数名”)拿参数值
 
-	对于简单的几个参数，action支持setter，getter模式获取，如action中有配置setter，则框架会判断当前是否存在当前参数名的setter，并自动注入参数值。考虑到从web页面提交过来的数据校验，建议少使用或不使用这种方式
+对于简单的几个参数，action支持setter，getter模式获取，如action中有配置setter，则框架会判断当前是否存在当前参数名的setter，并自动注入参数值。考虑到从web页面提交过来的数据校验，建议少使用或不使用这种方式
 
-	涉及简单数据库查询或更新（一般只有一次数据库读写），可以通过
+涉及简单数据库查询或更新（一般只有一次数据库读写），可以通过
 Service service = ServiceContext.getService()
 直接进行操作，如果业务逻辑比较复杂，或涉及多次数据库表操作，则必须实现对应业务模块的定制Service，完成相关业务层面的处理
 
-	send(String str,  String contentType) 
+send(String str,  String contentType) 
 制定向页面响应字符串，可以是text，json，html等
-	render(String pageFile) 显示Freemarker模板，模板相关参数设值，请通过：
+render(String pageFile) 显示Freemarker模板，模板相关参数设值，请通过：
 putRenderInfo(String key, Object value)   设置单个freemarker模板变量
 setRenderData(IData data)  设置一个IData类型的模板变量
-	forward(String actionUrl) 页面转发
-	redirect(String actionUrl)  url重定向
+forward(String actionUrl) 页面转发
+redirect(String actionUrl)  url重定向
 
 
 1.2.4	Service层
@@ -336,6 +337,7 @@ public class AdminService
 	public void setUserDao(Dao userDao) {
 		this.userDao = userDao;
 	}
+
 其中db1，db2为前面jdbc.properties文件中配置中datasource指定的名称
 这样，在操作不同Dao情况下，就会针对不同数据库进行查询或更新操作
 
@@ -356,17 +358,19 @@ AdminService service = ServiceContext.getService(AdminService.class)
 拿到实例。
 
 开发规范：
-	原则上Service命名以Service结尾
-	Service内部处理，统一以ServiceException对外抛出异常
-	Service 如果继承BaseService，内部不需要创建 setDao 之类setter，框架会自动注入Dao，其他情况，需要指定好Dao，框架才会他初始化其他Dao，并获取实例接口
-	Service内部涉及超过多张数据库表更新，或读写分离数据库，需要走写库时候，需要启用事务。
+原则上Service命名以Service结尾
+Service内部处理，统一以ServiceException对外抛出异常
+Service 如果继承BaseService，内部不需要创建 setDao 之类setter，框架会自动注入Dao，其他情况，需要指定好Dao，框架才会他初始化其他Dao，并获取实例接
+Service内部涉及超过多张数据库表更新，或读写分离数据库，需要走写库时候，需要启用事务。
 	
 直接在方法上面加入注解：
 @Transactional
 public int save(SysAdmin admin) throws ServiceException
    如果两者同时存在情况下，以注解为准
+ 
 如果方法内部涉及到多个数据库的更新事务，则需要在注解Transactional 指定是启用哪个数据源注解，可以支持多数据源事务
 在读写分离情况下，尤其要注意写库操作一定要记得启用事务，否则无法路由到主库更新数据
+
 1.2.5	工具类
 框架jar包：com.lezu.jftone.util 路径下有常用工具类：
 工具类	说明
@@ -394,7 +398,8 @@ SerializeUtil	Java序列化及反序列化
 一个实体仅仅只映射数据表字段。
 	实体类必须继承Model
 	实体类命名规则：去除表名下横杠以大写开头驼峰连接组成实体类名，例如：表prod_detail，对应实体类名为：ProdDetail；字段命名按照同样规则，并以小写开头，如prod_detail表字段 prod_name则命名为：prodName。
-	表名和字段名需要设置相关注解。具体如下：
+
+表名和字段名需要设置相关注解。具体如下：
 @Entity
 @Table(name="sys_admin")
 public class SysAdmin extends Model {
@@ -428,6 +433,8 @@ public class SysAdmin extends Model {
 }
 
     
-	主键字段需要设置@Id，@GeneratedValue并制定主键类型。其他字段只需要设置@Column 并指定表字段名字。对于时间类型字段，需要设置columnDefinition指定是datetime，date，还是time
+主键字段需要设置@Id，@GeneratedValue并制定主键类型。
+其他字段只需要设置@Column 并指定表字段名字。
+对于时间类型字段，需要设置columnDefinition指定是datetime，date，还是time
 
 以上就是这个项目的使用方法简介
