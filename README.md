@@ -15,7 +15,7 @@ JFToneListener为应用启动时候加载JFTone框架类
 
 context-param标签
 param-name固定为：appConfig
-param-value 请按照实际情况配置，默认为：web.properties，文件请配置在classes根目录下。
+param-value 请按照实际情况配置，默认为：jftone.properties，文件请配置在classes根目录下。
 
 <context-param>
 	<param-name>appConfig</param-name>
@@ -51,7 +51,6 @@ BaseConfig类需要按照实际情况配置相关资源访问映射路径
 url-pattern如果只处理特定格式请求，如： *.do   则appConfig 对应格式需要特殊制定
 
 1.1.2	jftone.properties配置
-
 #数据库连接配置文件，该文件直接放在classes根目录
 datasourceConfig=jdbc.properties
 
@@ -76,6 +75,7 @@ componentPackage=com.lezu.xxxx.service
 #设置启动时候需要随应用启动的业务初始化操作或相关加载数据
 listenService=com.xxxx.xxxx.config.CommonLoad
 
+#事务配置处理
 transactional=true
 transactionClass=com.xxx.xxx.service..*Service
 transactionMethod=save*|del*|update*
@@ -136,16 +136,20 @@ db242.databaseType=mysql
 
 如果数据库进行了读写分离，以上面多数据源为例来说明，db240为主库，其他为从库，则配置如下：
 clusterEnabled=true
+
 #如果有水平分库，变成多个域的情况，在这个项目通过逗号分隔，保持唯一即可
 clusterDomain=cluster1
 cluster1.master=db240
 cluster1.slave=db241,db242
+
 #下面此项可以不用配置，默认采用轮询模式
 cluster1.slave.weight=4:3   
+
 如果只有一个域的情况则可以简化为：
 clusterEnabled=true
 master=db240
 slave=db241,db242
+
 #下面此项可以不用配置，默认采用轮询模式，如果双主则为master.weight
 slave.weight=4:3
 
