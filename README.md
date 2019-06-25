@@ -51,6 +51,7 @@ BaseConfig类需要按照实际情况配置相关资源访问映射路径
 url-pattern如果只处理特定格式请求，如： *.do   则appConfig 对应格式需要特殊制定
 
 1.1.2	jftone.properties配置
+
 #数据库连接配置文件，该文件直接放在classes根目录
 datasourceConfig=jdbc.properties
 
@@ -98,6 +99,7 @@ cookieDomain=xxxxx.com
 
 
 1.1.3	jdbc.properties配置
+
 #数据库类型
 databaseType=mysql
 #数据库驱动类
@@ -416,7 +418,7 @@ public int save(SysAdmin admin) throws ServiceException
 在读写分离情况下，尤其要注意写库操作一定要记得启用事务，否则无法路由到主库更新数据
 
 1.2.5	工具类
-框架jar包：com.lezu.jftone.util 路径下有常用工具类：
+框架jar包：org.jftone.util 路径下有常用工具类：
 工具类	说明
 ClassUtil	根据指定包从文件或jar包中遍历查询所有class类
 DateUtil	时间获取或格式化等，应用中建议获取时间，建议全部从这个工具类取，后期会进行封装，保证分布式时间一致问题
@@ -442,10 +444,11 @@ SerializeUtil	Java序列化及反序列化
 实体类命名规则：去除表名下横杠以大写开头驼峰连接组成实体类名，例如：表prod_detail，对应实体类名为：ProdDetail；字段命名按照同样规则，并以小写开头，如prod_detail表字段 prod_name则命名为：prodName。
 
 表名和字段名需要设置相关注解。具体如下：
+
+
 @Entity
 @Table(name="sys_admin")
 public class SysAdmin extends Model {
-
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="id")
