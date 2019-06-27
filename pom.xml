@@ -48,7 +48,7 @@
 	</distributionManagement>
 	<properties>
 		<encoding>UTF-8</encoding>
-		<repository.url>http://xxx.xxx.xxx.xxx:xxxx/repository</repository.url>
+		<repository.url>http://maven.aliyun.com/nexus/content/groups/public/</repository.url>
 		<jdk.version>1.7</jdk.version>
 		<servlet.version>3.1.0</servlet.version>
 		<log4j2.version>2.11.2</log4j2.version>
