@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+dataType可选类型
+string,short,int,long,float,double,date,time,datetime,boolean,decimal
+-->
+<sqlMap>
+	<!-- 系统管理 -->					
+  	<statement id="queryConfigByType">
+  		<![CDATA[select conf_code code,conf_value value,conf_type type,conf_name name from para_config where conf_type=#CONF_TYPE#]]>
+  	</statement>					
+  	<statement id="querySysRole">
+  		<![CDATA[select role_name,role_code,role_level from sys_role order by role_level asc]]>
+  	</statement>
+  	<statement id="queryRightByRoleNode">
+  		<![CDATA[
+  		select n.menu_code as right_code,m.menu_name,m.menu_url,m.seq_sort 
+  		from sys_right n left join sys_menu m on n.menu_code=m.menu_code 
+  		where m.closed=0 <!- and n.node_code=#NODE_CODE# -> <!- and n.role_code=#ROLE_CODE# ->
+  		]]>
+  	</statement>
+
+  	<statement id="deleteRightByNodeAndRole">
+  		<![CDATA[delete from sys_right where role_code=#ROLE_CODE# and node_code=#NODE_CODE#]]>
+  	</statement>	
+	<!-- 系统管理 -->	
+	  					
+</sqlMap>
