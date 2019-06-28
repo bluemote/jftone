@@ -8,7 +8,6 @@ Jftone是一套集成，简单的后台框架，数据层支持SQL，同时也�
 1.1.1	web.xml配置
 	listener标签：
 
-
 	<listener>
 		   <listener-class>org.jftone.listener.JFToneListener</listener-class>
 	</listener>
@@ -255,33 +254,29 @@ Redis配置文件（redis-config.xml）
     	<filter-name>JFToneFilter</filter-name>
     	<filter-class>org.jftone.action.JFToneFilter</filter-class>
     	<init-param>
-			<param-name>config</param-name>
-			<param-value>com.xxx.sample.config.BaseConfig</param-value>
+		<param-name>config</param-name>
+		<param-value>com.xxx.sample.config.BaseConfig</param-value>
     	</init-param>
 	</filter>
 
 BaseConfig类必须继承框架抽象类：
 
-	com.lezu.jftone.config.AppConfig
+	org.jftone.config.AppConfig
 
 并实现其中两个方法：loadRoute ，loadInterceptor
 
-	返回值	方法
-	void	loadRoute(Route route)
-	加载action路由配置数据，例如：
-	route.add("/loginAction", LoginAction.class)  #也可以直接在action层的类上面增加@Controller 注解，制定路由映射
+	返回值	      方法
+	void	   	loadRoute(Route route)
+		加载action路由配置数据，例如：
+		route.add("/loginAction", LoginAction.class)  #也可以直接在action层的类上面增加@Controller 注解，制定路由映射
+		如果路由配置比较多，创建多个继承框架org.jftone.config.Route的类，并覆盖其中config方法通过route.add加入进来。
+		系统路由映射比较多的情况下，可以根据功能模块划分，创建多个实现Route的类，以避免loadRoute方法过于庞大
 
-	如果路由配置比较多，创建多个
-	继承框架com.lezu.jftone.config.Route
-	的类，并覆盖其中config方法
-	通过route.add加入进来。
-
-	系统路由映射比较多的情况下，可以根据功能模块划分，创建多个实现Route的类，以避免loadRoute方法过于庞大
-	List<ActionInterceptor>	loadInterceptor()
-	Action拦截器，可以配置多个，也可以不设置，每个ActionInterceptor必须实现三个方法：
-	before：action方法执行前调用
-	after：action方法执行后调用
-	throwable：action方法抛错调用
+	List<ActionInterceptor>		loadInterceptor()
+		Action拦截器，可以配置多个，也可以不设置，每个ActionInterceptor必须实现三个方法：
+		before：action方法执行前调用
+		after：action方法执行后调用
+		throwable：action方法抛错调用
 
 
 1.2.2	应用启动侦听
@@ -339,11 +334,11 @@ Action层相关类的映射在JFToneFilter的config类中配置，框架会根�
 直接进行操作，如果业务逻辑比较复杂，或涉及多次数据库表操作，则必须实现对应业务模块的定制Service，完成相关业务层面的处理
 
 	send(String str,  String contentType) 		制定向页面响应字符串，可以是text，json，html等
-	render(String pageFile) 					显示Freemarker模板，模板相关参数设值，请通过：
-	putRenderInfo(String key, Object value)     设置单个freemarker模板变量
-	setRenderData(IData data)  		设置一个IData类型的模板变量
-	forward(String actionUrl) 		页面转发
-	redirect(String actionUrl) 	 	url重定向
+	render(String pageFile) 			显示Freemarker模板，模板相关参数设值，请通过：
+	putRenderInfo(String key, Object value)     	设置单个freemarker模板变量
+	setRenderData(IData data)  			设置一个IData类型的模板变量
+	forward(String actionUrl) 			页面转发
+	redirect(String actionUrl) 	 		url重定向
 
 
 1.2.4	Service层
@@ -464,31 +459,31 @@ Service只是提供一些简单的访问操作，如果需要实现更加复杂�
     @Entity
     @Table(name="sys_admin")
     public class SysAdmin extends Model {
-		@Id
-		@GeneratedValue(strategy=GenerationType.IDENTITY)
-		@Column(name="id")
-		private Integer id;
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="id")
+	private Integer id;
 
-		@Column(name="login_time", columnDefinition="datetime" )
-		private Date loginTime;
+	@Column(name="login_time", columnDefinition="datetime" )
+	private Date loginTime;
 
-		@Column(name="login_ip")
-		private String loginIp;
+	@Column(name="login_ip")
+	private String loginIp;
 
-		@Column(name="user_name")
-		private String userName;
+	@Column(name="user_name")
+	private String userName;
 
-		@Column(name="locked")
-		private Short locked;
+	@Column(name="locked")
+	private Short locked;
 
-		@Column(name="password")
-		private String password;
+	@Column(name="password")
+	private String password;
 
-		@Column(name="mobile")
-		private String mobile;
+	@Column(name="mobile")
+	private String mobile;
 
-		public Integer getter()
-		public void setter(Integer id) 
+	public Integer getter()
+	public void setter(Integer id) 
         。。。。。。。。。。。。
     }
 
