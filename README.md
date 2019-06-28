@@ -75,7 +75,7 @@ filter标签
 	modelPackage=com.xxxx.xxxx.model
 
 	#项目文件Service类包路径，，并设置相关注解，可以设置子目录包, 如果多个包下，以英文逗号分隔
-	componentPackage=com.lezu.xxxx.service
+	componentPackage=com.xxxx.xxxx.service
 
 	#设置启动时候需要随应用启动的业务初始化操作或相关加载数据
 	listenService=com.xxxx.xxxx.config.CommonLoad
