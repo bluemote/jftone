@@ -426,26 +426,6 @@ Service只是提供一些简单的访问操作，如果需要实现更加复杂�
 如果方法内部涉及到多个数据库的更新事务，则需要在注解Transactional 指定是启用哪个数据源注解，可以支持多数据源事务
 在读写分离情况下，尤其要注意写库操作一定要记得启用事务，否则无法路由到主库更新数据
 
-1.2.5	工具类
-框架jar包：org.jftone.util 路径下有常用工具类：
-
-	工具类	说明
-	ClassUtil	根据指定包从文件或jar包中遍历查询所有class类
-	DateUtil	时间获取或格式化等，应用中建议获取时间，建议全部从这个工具类取，后期会进行封装，保证分布式时间一致问题
-	EncryptUtil	Md5，sha1  base64等加密工具
-	FileUtil	文件读写
-	OKHttpUtil	http连接工具类，包括同步，非阻塞，HTTPS等
-	ImageUtil	图片文件裁剪，缩放工具类
-	Ipv4Util	获取ip地址，同时支持ip地址字符到长整形相互转换
-	JsonUtil	对象转json工具类
-	MathUtil	数字格式化，转换，仍在扩展补充
-	ObjectUtil	对象复制，反射设置，取值等
-	Page	分页对象
-	StringUtil	字符串工具处理
-	VerifyCodeUtil	验证码工具类
-	CompressUtil	字节流压缩及解压
-	SerializeUtil	Java序列化及反序列化
-	。。。。。	。。。。。。。。。。。
 
 1.3	Model配置及生成
 
