@@ -43,7 +43,7 @@ public final class DataSourceUtil {
 	 */
 	public static Connection getConnection(RouteDataSource routeDataSource) {
 		String routeDataSourceKey = DataSourceSynchronizationManager
-				.getCurrentDataSourceKey(routeDataSource.getRouteDataSource());
+				.getRuntimeDataSourceMappingKey(routeDataSource.getRouteDataSource());
 		
 		return getConnection(routeDataSourceKey);
 	}
@@ -55,7 +55,7 @@ public final class DataSourceUtil {
 	 */
 	public static void releaseConnection(Connection conn, RouteDataSource routeDataSource) {
 		String routeDataSourceKey = DataSourceSynchronizationManager
-				.getCurrentDataSourceKey(routeDataSource.getRouteDataSource());
+				.getRuntimeDataSourceMappingKey(routeDataSource.getRouteDataSource());
 		releaseConnection(conn, routeDataSourceKey);
 	}
 	

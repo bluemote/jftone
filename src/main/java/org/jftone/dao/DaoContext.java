@@ -30,6 +30,10 @@ public final class DaoContext {
 	
 	public static Dao createDao(String routeDsName, boolean cluster){
 		if(StringUtil.isBlank(routeDsName)){
+			/**
+			 * 如果cluster=true，则根据直接获取默认集群KEY，否则根据实际情况来决定，如果数据源配置支持集群，则取默认集群KEY，否则获取默认数据源KEY
+			 * 此默认配置，则系统启动初始化时候便已经决定，否则按照实际制定的routeDsName来
+			 */
 			routeDsName = DataSourceContext.getDefaultRouteName(cluster);
 		}
 		if(null == daoMap || !daoMap.containsKey(routeDsName)){

@@ -51,6 +51,7 @@ public class Const {
 	public static final String JDBC_DRIVER_ORACLE = "oracle.jdbc.driver.OracleDriver";
 	public static final String JDBC_DRIVER_DB2 = "com.ibm.db2.jcc.DB2Driver"; // com.ibm.db2.jdbc.app.DB2Driver
 	public static final String JDBC_DRIVER_SQLITE = "org.sqlite.JDBC";
+	public static final String JDBC_DRIVER_POSTGRESQL = "org.postgresql.Driver";
 
 }
 

@@ -15,8 +15,8 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.jftone.jdbc.MySQLWrapper;
 import org.jftone.jdbc.SqlWrapper;
+import org.jftone.jdbc.mysql.MySQLWrapper;
 
 public final class DataSourceContext {
 	// 数据库连接池对象
@@ -28,6 +28,7 @@ public final class DataSourceContext {
 
 	private static boolean clusterEnabled = false;
 
+	//在配置有数据源名字情况下，默认数据源标记名为数据源配置数组第一个KEY，系统启动初始化时候设置
 	private static String defaultDatasourceName = "jdbc";
 
 	private DataSourceContext() {
@@ -38,15 +39,22 @@ public final class DataSourceContext {
 		String dataSourceName = DataSourceSynchronizationManager.getDataSourceName(routeDsKey);
 		if (null == sqlWrapperMap || !sqlWrapperMap.containsKey(dataSourceName)) {
 			SqlWrapper sqlWrapper = null;
-			//如果找不到对应的数据库类型，默认采用Mysql
-			if (!dbTypeMap.containsKey(dataSourceName)) {
-				sqlWrapper = new MySQLWrapper();
-			} else {
-				sqlWrapper = dbTypeMap.get(dataSourceName).getSqlWrapper();
+			// 如果找不到对应的数据库类型，默认采用Mysql
+			synchronized (dataSourceName) {
+				if (!dbTypeMap.containsKey(dataSourceName)) {
+					sqlWrapper = new MySQLWrapper();
+				} else {
+					sqlWrapper = dbTypeMap.get(dataSourceName).getSqlWrapper();
+				}
 			}
 			sqlWrapperMap.put(dataSourceName, sqlWrapper);
 		}
 		return sqlWrapperMap.get(dataSourceName);
+	}
+
+	public static DBType getDBType(String routeDsKey) {
+		String dataSourceName = DataSourceSynchronizationManager.getDataSourceName(routeDsKey);
+		return dbTypeMap.get(dataSourceName);
 	}
 
 	/**
@@ -84,6 +92,7 @@ public final class DataSourceContext {
 	public static boolean isClusterEnabled() {
 		return DataSourceContext.clusterEnabled;
 	}
+
 	/**
 	 * 
 	 * @param clusterDomain
@@ -95,7 +104,6 @@ public final class DataSourceContext {
 
 	/**
 	 * 设置缺省数据源名字
-	 * 
 	 * @param dataSourceName
 	 */
 	static void setDefaultDataSourceName(String dataSourceName) {
@@ -124,24 +132,33 @@ public final class DataSourceContext {
 	}
 
 	/**
-	 * 获取路由数据源标识名 只是一个虚拟的默认路由名字
-	 * 如果调用者没有指定是否是集群模式，系统会根据配置的数据自动判断
+	 * 获取路由数据源标识名 只是一个虚拟的默认路由名字 如果调用者没有指定是否是集群模式，系统会根据配置的数据自动判断
+	 * 
 	 * @param dataSourceName
 	 * @return
 	 */
 	public static String getDefaultRouteName() {
 		return getDefaultRouteName(DataSourceContext.clusterEnabled);
 	}
+
+	/**
+	 * 如果为明确指定为集群模式(true)，则返回默认的集群KEY
+	 * 否则(false)，根据当前配置模式，如果配置集群模式，则启用默认集群KEY，否则默认数据源KEY
+	 * @param cluster
+	 * @return
+	 */
 	public static String getDefaultRouteName(boolean cluster) {
-		return !cluster? DataSourceContext.defaultDatasourceName
-				: ClusterDataSource.getDefaultClusterName();
+		if (cluster) {
+			return ClusterDataSource.getDefaultClusterName();
+		}
+		return DataSourceContext.clusterEnabled ? ClusterDataSource.getDefaultClusterName()
+				: DataSourceContext.defaultDatasourceName;
 	}
 
 	/**
 	 * 获取实际数据源标识名 主要是对缺省命名数据源（为空的数据源）进行转换，并计算对应的集群路由名字
 	 * 
-	 * @param routeDsName
-	 *            经过计算及转换以后的数据源KEY
+	 * @param routeDsName 经过计算及转换以后的数据源KEY
 	 * @return
 	 */
 	public static String getRealDataSourceName(String routeDsName) {
@@ -155,13 +172,13 @@ public final class DataSourceContext {
 	}
 
 	public static void destroyed() throws SQLException {
-		if (datasourceMap.isEmpty()){
+		if (datasourceMap.isEmpty()) {
 			return;
 		}
-		//释放数据库连接
-		for(Map.Entry<String, DataSource> ds : datasourceMap.entrySet()){
-			if(ds.getValue() instanceof BasicDataSource){
-				((BasicDataSource)ds.getValue()).close();
+		// 释放数据库连接
+		for (Map.Entry<String, DataSource> ds : datasourceMap.entrySet()) {
+			if (ds.getValue() instanceof BasicDataSource) {
+				((BasicDataSource) ds.getValue()).close();
 			}
 		}
 		// 清理集群配置数据

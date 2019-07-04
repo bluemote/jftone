@@ -119,7 +119,7 @@ abstract class BeanLoader {
 			DataSource ds = field.getAnnotation(DataSource.class);
 			
 			Method method = beanClazz.getMethod(ObjectUtil.getSetter(field.getName()), Dao.class);
-			method.invoke(serviceInstance, DaoContext.createDao(ds.value()));
+			method.invoke(serviceInstance, DaoContext.createDao(ds.value(), ds.cluster()));
 			method = null;
 			
 			/**

@@ -9,6 +9,7 @@ final class ClusterDataSource {
 	public static final String KEY_MASTER = "master";
 	public static final String KEY_SLAVE = "slave";
 	
+	//在配置有集群名字情况下，默认集群标记名为集群配置数组第一个KEY,系统启动初始化时候设置
 	private static String defaultClusterName = "cluster";
 	// 数据库连接池对象
 	private static Map<String, String[]> dbClusterMap = new HashMap<>();
