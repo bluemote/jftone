@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jftone.dao.DataSort;
 import org.jftone.exception.CommonException;
 import org.jftone.exception.DaoException;
 import org.jftone.model.Model;
@@ -120,9 +121,9 @@ public class TableStructureWrapper {
 	 */
 	public <T extends Model> void parseNotNullModel(T model) throws DaoException, CommonException{
 		String propertyName = null;
-		List<String> editFields = new ArrayList<String>();
-		List<Object> paramOjects = new ArrayList<Object>();
-		List<JdbcType> paramTypes = new ArrayList<JdbcType>();
+		List<String> editFields = new ArrayList<>();
+		List<Object> paramOjects = new ArrayList<>();
+		List<JdbcType> paramTypes = new ArrayList<>();
 		FieldStructure field = null;
 		Object fieldValue = null;
 		String fieldName = null;
@@ -150,9 +151,9 @@ public class TableStructureWrapper {
 	
 	public <T extends Model> void parseDataMap(IData<String, Object> data) throws DaoException, CommonException{
 		String propertyName = null;
-		List<String> sqlFields = new ArrayList<String>();
-		List<Object> paramOjects = new ArrayList<Object>();
-		List<JdbcType> paramTypes = new ArrayList<JdbcType>();
+		List<String> sqlFields = new ArrayList<>();
+		List<Object> paramOjects = new ArrayList<>();
+		List<JdbcType> paramTypes = new ArrayList<>();
 		FieldStructure field = null;
 		Object fieldValue = null;
 		for(Entry<String, Object> entry : data.entrySet()){
@@ -168,6 +169,22 @@ public class TableStructureWrapper {
 		setParseValues(paramOjects);
 		setParseTypes(paramTypes);
 	}
+	
+	public List<SqlSort> parseSortList(List<DataSort> dss) throws DaoException, CommonException{
+		List<SqlSort> sqlSortList = new ArrayList<>();
+		for(DataSort ds : dss){
+			SqlSort ss = new SqlSort();
+			if(!fieldMap.containsKey(ds.getProperty())) {
+				continue;
+			}
+			ss.setFieldName(fieldMap.get(ds.getProperty()).getName());
+			ss.setSort(ds.getSort());
+			
+			sqlSortList.add(ss);
+		}
+		return sqlSortList;
+	}
+	
 	/**
 	 * 解析SQL WHERE条件的参数字段
 	 * 只获取关键字字段
@@ -175,7 +192,7 @@ public class TableStructureWrapper {
 	 * @throws DaoException
 	 */
 	public List<String> getPkField() throws DaoException{
-		List<String> pkFields = new ArrayList<String>();
+		List<String> pkFields = new ArrayList<>();
 		pkFields.add(tableStructure.getPrimaryKey());
 		return pkFields;
 	}
@@ -186,7 +203,7 @@ public class TableStructureWrapper {
 	 * @throws DaoException
 	 */
 	public List<String> getAllField() throws DaoException{
-		List<String> sqlFields = new ArrayList<String>();
+		List<String> sqlFields = new ArrayList<>();
 		for(Entry<String, FieldStructure> entry : fieldMap.entrySet()){
 			sqlFields.add(entry.getValue().getName());
 		}

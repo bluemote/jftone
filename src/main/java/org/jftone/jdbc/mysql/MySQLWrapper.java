@@ -6,12 +6,14 @@
  * @date   		Jul 27, 2011
  * @revision	v1.0
  */
-package org.jftone.jdbc;
+package org.jftone.jdbc.mysql;
 
 import java.util.List;
 
 import org.jftone.config.Const;
 import org.jftone.exception.DbException;
+import org.jftone.jdbc.SqlSort;
+import org.jftone.jdbc.SqlWrapper;
 
 
 public final class MySQLWrapper extends SqlWrapper {
@@ -24,30 +26,17 @@ public final class MySQLWrapper extends SqlWrapper {
 	 * @param sqlFields
 	 * @param pkFields
 	 * @param sqlExpression
+	 * @param List<SqlSort> sqlSortList
 	 * @param firstResult
 	 * @param maxResults
 	 * @return
 	 * @throws DbException
 	 */
 	public String buildSelectSQL(String tableName, List<String> selectFields, 
-			List<String> condFields, long firstResult, int maxResults) throws DbException{
-		StringBuilder sb = new StringBuilder();
-		int i=0;
-		sb.append("SELECT ");
-		for(String fieldName : selectFields){
-			sb.append(i>0? Const.SPLIT_COMMA : "").append(fieldName);
-			i++;
-		}
-		sb.append(" FROM "+tableName);
-		if(null != condFields && condFields.size()>0){
-			sb.append(" WHERE ");
-			i=0;
-			for(String fieldName : condFields){
-				sb.append(i>0? " AND " : "").append(fieldName+"=?");
-				i++;
-			}
-		}
-		sb.append(" LIMIT "+firstResult+Const.SPLIT_COMMA+maxResults);
+			List<String> condFields, List<SqlSort> sqlSortList, long firstResult, int maxResults) throws DbException{
+		StringBuilder sb = new StringBuilder(buildSelectSQL(tableName, selectFields, condFields, sqlSortList));
+		sb.append(" LIMIT ").append(firstResult);
+		sb.append(Const.SPLIT_COMMA).append(maxResults);
 		return sb.toString();
 	}
 }

@@ -1,11 +1,15 @@
 package org.jftone.datasource;
 
 import org.jftone.config.Const;
-import org.jftone.jdbc.MySQLWrapper;
-import org.jftone.jdbc.SQLiteWrapper;
 import org.jftone.jdbc.SqlWrapper;
+import org.jftone.jdbc.db2.DB2Wrapper;
+import org.jftone.jdbc.mysql.MySQLWrapper;
+import org.jftone.jdbc.oracle.OracleWrapper;
+import org.jftone.jdbc.postgresql.PostgreSQLWrapper;
+import org.jftone.jdbc.sqlite.SQLiteWrapper;
+import org.jftone.jdbc.sqlserver.SQLServerWrapper;
 
-enum DBType {
+public enum DBType {
 	MYSQL("mysql"){
 		@Override
 		SqlWrapper getSqlWrapper() {
@@ -20,7 +24,7 @@ enum DBType {
 	SQLSERVER("sqlserver"){
 		@Override
 		SqlWrapper getSqlWrapper() {
-			return null;
+			return new SQLServerWrapper();
 		}
 
 		@Override
@@ -31,7 +35,7 @@ enum DBType {
 	ORACLE("oracle"){
 		@Override
 		SqlWrapper getSqlWrapper() {
-			return null;
+			return new OracleWrapper();
 		}
 
 		@Override
@@ -42,7 +46,7 @@ enum DBType {
 	DB2("db2"){
 		@Override
 		SqlWrapper getSqlWrapper() {
-			return null;
+			return new DB2Wrapper();
 		}
 
 		@Override
@@ -60,13 +64,24 @@ enum DBType {
 		String getDriverName() {
 			return Const.JDBC_DRIVER_SQLITE;
 		}
+	},
+	POSTGRESQL("postgresql"){
+		@Override
+		SqlWrapper getSqlWrapper() {
+			return new PostgreSQLWrapper();
+		}
+
+		@Override
+		String getDriverName() {
+			return Const.JDBC_DRIVER_SQLITE;
+		}
 	};
 	private String code;
 	DBType(String code){
 		this.code = code;
 	}
 	
-	String code() {
+	public String code() {
 		return this.code;
 	}
 	

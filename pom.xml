@@ -5,7 +5,7 @@
 	<artifactId>jftone</artifactId>
 	<!--项目产生的构件类型，例如jar、war、ear、pom。插件可以创建他们自己的构件类型，所以前面列的不是全部构件类型 -->
 	<packaging>jar</packaging>
-	<version>1.2.8</version>
+	<version>1.2.9</version>
 	<name>Jftone</name>
 	<repositories>
 		<repository>
@@ -48,7 +48,7 @@
 	</distributionManagement>
 	<properties>
 		<encoding>UTF-8</encoding>
-		<repository.url>http://maven.aliyun.com/nexus/content/groups/public/</repository.url>
+		<repository.url>http://192.168.1.253:8081/repository</repository.url>
 		<jdk.version>1.7</jdk.version>
 		<servlet.version>3.1.0</servlet.version>
 		<log4j2.version>2.11.2</log4j2.version>
