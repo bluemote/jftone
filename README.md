@@ -1,4 +1,4 @@
-# jftone
+# Jftone
 Jftone是一套集成，简单的后台框架，数据层支持SQL，同时也支持一定程度的O/R映射，并且支持服务组件的相互依赖注入，AOP拦截，多数据源，集群事务管理。
 目前仅仅支持MySQL版本，其他数据库版本暂时没有扩展，没有特殊配置，基本都支持，比如Sqlite就可以直接使用
 
@@ -7,7 +7,6 @@ Jftone是一套集成，简单的后台框架，数据层支持SQL，同时也�
 1.1	配置文件
 1.1.1	web.xml配置
 	listener标签：
-
 
 	<listener>
 		   <listener-class>org.jftone.listener.JFToneListener</listener-class>
@@ -76,7 +75,7 @@ filter标签
 	modelPackage=com.xxxx.xxxx.model
 
 	#项目文件Service类包路径，，并设置相关注解，可以设置子目录包, 如果多个包下，以英文逗号分隔
-	componentPackage=com.lezu.xxxx.service
+	componentPackage=com.xxxx.xxxx.service
 
 	#设置启动时候需要随应用启动的业务初始化操作或相关加载数据
 	listenService=com.xxxx.xxxx.config.CommonLoad
@@ -255,33 +254,29 @@ Redis配置文件（redis-config.xml）
     	<filter-name>JFToneFilter</filter-name>
     	<filter-class>org.jftone.action.JFToneFilter</filter-class>
     	<init-param>
-			<param-name>config</param-name>
-			<param-value>com.xxx.sample.config.BaseConfig</param-value>
+		<param-name>config</param-name>
+		<param-value>com.xxx.sample.config.BaseConfig</param-value>
     	</init-param>
 	</filter>
 
 BaseConfig类必须继承框架抽象类：
 
-	com.lezu.jftone.config.AppConfig
+	org.jftone.config.AppConfig
 
 并实现其中两个方法：loadRoute ，loadInterceptor
 
-	返回值	方法
-	void	loadRoute(Route route)
-	加载action路由配置数据，例如：
-	route.add("/loginAction", LoginAction.class)  #也可以直接在action层的类上面增加@Controller 注解，制定路由映射
+	返回值	      方法
+	void	   	loadRoute(Route route)
+		加载action路由配置数据，例如：
+		route.add("/loginAction", LoginAction.class)  #也可以直接在action层的类上面增加@Controller 注解，制定路由映射
+		如果路由配置比较多，创建多个继承框架org.jftone.config.Route的类，并覆盖其中config方法通过route.add加入进来。
+		系统路由映射比较多的情况下，可以根据功能模块划分，创建多个实现Route的类，以避免loadRoute方法过于庞大
 
-	如果路由配置比较多，创建多个
-	继承框架com.lezu.jftone.config.Route
-	的类，并覆盖其中config方法
-	通过route.add加入进来。
-
-	系统路由映射比较多的情况下，可以根据功能模块划分，创建多个实现Route的类，以避免loadRoute方法过于庞大
-	List<ActionInterceptor>	loadInterceptor()
-	Action拦截器，可以配置多个，也可以不设置，每个ActionInterceptor必须实现三个方法：
-	before：action方法执行前调用
-	after：action方法执行后调用
-	throwable：action方法抛错调用
+	List<ActionInterceptor>		loadInterceptor()
+		Action拦截器，可以配置多个，也可以不设置，每个ActionInterceptor必须实现三个方法：
+		before：action方法执行前调用
+		after：action方法执行后调用
+		throwable：action方法抛错调用
 
 
 1.2.2	应用启动侦听
@@ -339,11 +334,11 @@ Action层相关类的映射在JFToneFilter的config类中配置，框架会根�
 直接进行操作，如果业务逻辑比较复杂，或涉及多次数据库表操作，则必须实现对应业务模块的定制Service，完成相关业务层面的处理
 
 	send(String str,  String contentType) 		制定向页面响应字符串，可以是text，json，html等
-	render(String pageFile) 					显示Freemarker模板，模板相关参数设值，请通过：
-	putRenderInfo(String key, Object value)     设置单个freemarker模板变量
-	setRenderData(IData data)  		设置一个IData类型的模板变量
-	forward(String actionUrl) 		页面转发
-	redirect(String actionUrl) 	 	url重定向
+	render(String pageFile) 			显示Freemarker模板，模板相关参数设值，请通过：
+	putRenderInfo(String key, Object value)     	设置单个freemarker模板变量
+	setRenderData(IData data)  			设置一个IData类型的模板变量
+	forward(String actionUrl) 			页面转发
+	redirect(String actionUrl) 	 		url重定向
 
 
 1.2.4	Service层
@@ -431,26 +426,6 @@ Service只是提供一些简单的访问操作，如果需要实现更加复杂�
 如果方法内部涉及到多个数据库的更新事务，则需要在注解Transactional 指定是启用哪个数据源注解，可以支持多数据源事务
 在读写分离情况下，尤其要注意写库操作一定要记得启用事务，否则无法路由到主库更新数据
 
-1.2.5	工具类
-框架jar包：org.jftone.util 路径下有常用工具类：
-
-	工具类	说明
-	ClassUtil	根据指定包从文件或jar包中遍历查询所有class类
-	DateUtil	时间获取或格式化等，应用中建议获取时间，建议全部从这个工具类取，后期会进行封装，保证分布式时间一致问题
-	EncryptUtil	Md5，sha1  base64等加密工具
-	FileUtil	文件读写
-	OKHttpUtil	http连接工具类，包括同步，非阻塞，HTTPS等
-	ImageUtil	图片文件裁剪，缩放工具类
-	Ipv4Util	获取ip地址，同时支持ip地址字符到长整形相互转换
-	JsonUtil	对象转json工具类
-	MathUtil	数字格式化，转换，仍在扩展补充
-	ObjectUtil	对象复制，反射设置，取值等
-	Page	分页对象
-	StringUtil	字符串工具处理
-	VerifyCodeUtil	验证码工具类
-	CompressUtil	字节流压缩及解压
-	SerializeUtil	Java序列化及反序列化
-	。。。。。	。。。。。。。。。。。
 
 1.3	Model配置及生成
 
@@ -464,31 +439,31 @@ Service只是提供一些简单的访问操作，如果需要实现更加复杂�
     @Entity
     @Table(name="sys_admin")
     public class SysAdmin extends Model {
-		@Id
-		@GeneratedValue(strategy=GenerationType.IDENTITY)
-		@Column(name="id")
-		private Integer id;
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="id")
+	private Integer id;
 
-		@Column(name="login_time", columnDefinition="datetime" )
-		private Date loginTime;
+	@Column(name="login_time", columnDefinition="datetime" )
+	private Date loginTime;
 
-		@Column(name="login_ip")
-		private String loginIp;
+	@Column(name="login_ip")
+	private String loginIp;
 
-		@Column(name="user_name")
-		private String userName;
+	@Column(name="user_name")
+	private String userName;
 
-		@Column(name="locked")
-		private Short locked;
+	@Column(name="locked")
+	private Short locked;
 
-		@Column(name="password")
-		private String password;
+	@Column(name="password")
+	private String password;
 
-		@Column(name="mobile")
-		private String mobile;
+	@Column(name="mobile")
+	private String mobile;
 
-		public Integer getter()
-		public void setter(Integer id) 
+	public Integer getter()
+	public void setter(Integer id) 
         。。。。。。。。。。。。
     }
 
