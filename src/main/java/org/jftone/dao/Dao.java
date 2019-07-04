@@ -12,15 +12,15 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.jftone.config.Const;
+import org.jftone.datasource.DBType;
 import org.jftone.datasource.DataSourceUtil;
 import org.jftone.datasource.RouteDataSource;
 import org.jftone.exception.DaoException;
 import org.jftone.jdbc.DBRepository;
 import org.jftone.jdbc.DBUtil;
 import org.jftone.jdbc.JdbcType;
+import org.jftone.jdbc.SqlSort;
 import org.jftone.jdbc.SqlStructure;
 import org.jftone.jdbc.SqlStructureWrapper;
 import org.jftone.jdbc.SqlWrapper;
@@ -34,6 +34,8 @@ import org.jftone.util.EncryptUtil;
 import org.jftone.util.IData;
 import org.jftone.util.ObjectUtil;
 import org.jftone.util.Page;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class Dao {
 	private Logger log = LoggerFactory.getLogger(Dao.class);
@@ -401,7 +403,7 @@ public final class Dao {
 			TableStructureWrapper tsWrapper = TableStructureWrapper.getWrapper(table);	
 			List<String> sqlConds = tsWrapper.getPkField();
 			List<String> queryFields = tsWrapper.getAllField();
-			String loadSQL = datasource.getSqlWrapper().buildSelectSQL(table.getName(), queryFields, sqlConds);
+			String loadSQL = datasource.getSqlWrapper().buildSelectSQL(table.getName(), queryFields, sqlConds, null);
 			
 			model = modelCls.newInstance();
 			model = DBUtil.query(conn, loadSQL, new Object[]{id}, new JdbcType[]{table.getPrimaryType()}, 
@@ -424,49 +426,51 @@ public final class Dao {
 	
 	/**
 	 * 根据过滤条件查询多个对象
-	 * @param modelCls
-	 * @param whereData
+	 * @param <T>
+	 * @param modelCls		查询对象
+	 * @param whereData		查询条件
 	 * @return
 	 * @throws DaoException
 	 */
 	public <T extends Model> List<T> query(final Class<T> modelCls, IData<String, Object> whereData) throws DaoException {
-		List<T> resultList = new ArrayList<T>();
-		String modelName = modelCls.getSimpleName();
-		TableStructure table = DBRepository.getTable(modelName);
-		Connection conn = DataSourceUtil.getConnection(datasource);
-		try {
-			List<String> condFields = null;
-			List<Object> paramList = null;
-			List<JdbcType> typeList = null;
-			TableStructureWrapper tsWrapper = TableStructureWrapper.getWrapper(table);
-			if(null != whereData && whereData.size()>0){
-				tsWrapper.parseDataMap(whereData);
-				condFields = tsWrapper.getParseFields();
-				paramList = tsWrapper.getParseValues();
-				typeList = tsWrapper.getParseTypes();
-			}
-			
-			String loadSQL = datasource.getSqlWrapper().buildSelectSQL(table.getName(), tsWrapper.getAllField(), condFields);
-			resultList = DBUtil.query(conn, loadSQL, paramList==null? null : paramList.toArray(), 
-					typeList==null? null : typeList.toArray(new JdbcType[0]), new BeanListHandler<T>(modelCls, table.getFieldData()));
-		} catch (Exception e) {
-			log.error(String.format("查询[%s]数据错误", modelCls.getName()), e);
-			throw new DaoException(e);
-		}finally{
-			DataSourceUtil.releaseConnection(conn, datasource);
-		}
-		return resultList;
+		return query(modelCls, whereData, null, null);
+	}
+	/**
+	 * 根据过滤条件查询多个对象
+	 * @param <T>
+	 * @param modelCls		查询对象
+	 * @param whereData		查询条件
+	 * @param sqlOrderList	排序
+	 * @return
+	 * @throws DaoException
+	 */
+	public <T extends Model> List<T> query(final Class<T> modelCls, IData<String, Object> whereData, List<DataSort> dataSortList) throws DaoException {
+		return query(modelCls, whereData, dataSortList, null);
 	}
 	
 	/**
 	 * 根据过滤条件返回一定数量的对象
 	 * 分页使用
-	 * @param model
+	 * @param model		查询对象
+	 * @param whereData	查询条件
 	 * @param page		分页对象
 	 * @return
 	 * @throws DaoException
 	 */
 	public <T extends Model> List<T> query(final Class<T> modelCls, IData<String, Object> whereData, Page page) throws DaoException {
+		return query(modelCls, whereData, null, page) ;
+	}
+	/**
+	 * 根据过滤条件查询多个对象
+	 * @param <T>
+	 * @param modelCls		查询对象
+	 * @param whereData		查询条件
+	 * @param sqlOrderList	排序
+	 * @param page			分页
+	 * @return
+	 * @throws DaoException
+	 */
+	public <T extends Model> List<T> query(final Class<T> modelCls, IData<String, Object> whereData, List<DataSort> dataSortList, Page page) throws DaoException {
 		List<T> resultList = new ArrayList<T>();
 		String modelName = modelCls.getSimpleName();
 		TableStructure table = DBRepository.getTable(modelName);
@@ -487,16 +491,22 @@ public final class Dao {
 			
 			Object[] params = paramList==null? null : paramList.toArray();
 			JdbcType[] types = typeList==null? null : typeList.toArray(new JdbcType[0]);
-			
-			SqlWrapper sqlWrapper = datasource.getSqlWrapper();
-			String countSQL = sqlWrapper.buildCountSQL(table.getName(), condFields);
-			long resultCount = DBUtil.count(conn, countSQL, params , types);
-			if(resultCount == 0){
-				return resultList;
+			//排序字段
+			List<SqlSort> sqlSortList = null == dataSortList ? null : tsWrapper.parseSortList(dataSortList);
+			if(null == page) {
+				String loadSQL = datasource.getSqlWrapper().buildSelectSQL(table.getName(), tsWrapper.getAllField(), condFields, sqlSortList);
+				resultList = DBUtil.query(conn, loadSQL, params, types, new BeanListHandler<T>(modelCls, table.getFieldData()));
+			}else {
+				SqlWrapper sqlWrapper = datasource.getSqlWrapper();
+				String countSQL = sqlWrapper.buildCountSQL(table.getName(), condFields);
+				long resultCount = DBUtil.count(conn, countSQL, params , types);
+				if(resultCount == 0){
+					return resultList;
+				}
+				page.setRecordCount(resultCount);
+				String loadPageSQL = sqlWrapper.buildSelectSQL(table.getName(), selectFields, condFields, sqlSortList, page.getStart(), page.getPageSize());
+				resultList = DBUtil.query(conn , loadPageSQL, params , types, new BeanListHandler<T>(modelCls, table.getFieldData()));			
 			}
-			page.setRecordCount(resultCount);
-			String loadPageSQL = sqlWrapper.buildSelectSQL(table.getName(), selectFields, condFields, page.getStart(), page.getPageSize());
-			resultList = DBUtil.query(conn , loadPageSQL, params , types, new BeanListHandler<T>(modelCls, table.getFieldData()));			
 		} catch (Exception e) {
 			log.error(String.format("查询[%s]分页数据错误", modelCls.getName()), e);
 			throw new DaoException(e);
@@ -550,12 +560,12 @@ public final class Dao {
 	 * @throws DaoException
 	 */
 	public <T extends Model> List<T> query(String statementName, Class<T> modelCls, IData<String, Object> paramData) throws DaoException {
-		return dbQuery(statementName, paramData, modelCls, null);
+		return dbQuery(modelCls, statementName, paramData, null);
 	}
 	public List<IData<String, Object>> query(String statementName, IData<String, Object> paramData) throws DaoException {
 		return dbQuery(statementName, paramData, null);
 	}
-	
+
 	/**
 	 * 根据查询sql进行联合查询，默认不进行重复筛选
 	 * @param statementName
@@ -593,7 +603,7 @@ public final class Dao {
 	 * @throws DaoException
 	 */
 	public <T extends Model> List<T> query(String statementName, Class<T> modelCls, IData<String, Object> paramData, Page page) throws DaoException {
-		return dbQuery(statementName, paramData, modelCls, page);
+		return dbQuery(modelCls, statementName, paramData, page);
 	}
 	public List<IData<String, Object>> query(String statementName, IData<String, Object> paramData, Page page) throws DaoException {
 		return dbQuery(statementName, paramData, page);
@@ -620,6 +630,8 @@ public final class Dao {
 			String tmpSql = "";
 			List<JdbcType> tmpTypes = null;
 			
+			DBType dbType = datasource.getDBType();
+			
 			for(IData<String, Object> paramData : paramDataList){
 				sWrapper.parseParam(paramData);
 				paramList.addAll(sWrapper.getParamValues());
@@ -630,7 +642,8 @@ public final class Dao {
 					sqlBuilder.append(unionStr);
 				}
 				typeList.addAll(tmpTypes);
-				sqlBuilder.append(tmpSql);
+				//对于非sqlite数据库，增加括号
+				sqlBuilder.append(dbType.code().equals(DBType.SQLITE.code())? tmpSql : "(" + tmpSql + ")");
 				i++;
 			}
 			
@@ -728,7 +741,7 @@ public final class Dao {
 		}
 		return retList;
 	}
-	private <T extends Model> List<T> dbQuery(String statementName, IData<String, Object> paramData, Class<T> retCls, Page page) throws DaoException{
+	private <T extends Model> List<T> dbQuery(Class<T> retCls, String statementName, IData<String, Object> paramData, Page page) throws DaoException{
 		List<T> retList = new ArrayList<T>();
 		SqlStructure sqlObj = DBRepository.getSQLStatement(statementName);
 		if(null == sqlObj){
