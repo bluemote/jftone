@@ -680,7 +680,7 @@ public final class Dao {
 			int i=0;
 			String tmpSql = "";
 			List<JdbcType> tmpTypes = null;
-			
+			DBType dbType = datasource.getDBType();
 			for(IData<String, Object> paramData : paramDataList){
 				sWrapper.parseParam(paramData);
 				paramList.addAll(sWrapper.getParamValues());
@@ -691,7 +691,8 @@ public final class Dao {
 					sqlBuilder.append(unionStr);
 				}
 				typeList.addAll(tmpTypes);
-				sqlBuilder.append(tmpSql);
+				//对于非sqlite数据库，增加括号
+				sqlBuilder.append(dbType.code().equals(DBType.SQLITE.code())? tmpSql : "(" + tmpSql + ")");
 				i++;
 			}
 			
