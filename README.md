@@ -108,11 +108,11 @@ filter标签
 	#数据库驱动类
 	driverClassName=com.mysql.jdbc.Driver
 	#数据库连接串
-	url=jdbc:mysql://localhost:3306/cailutone?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&failOverReadOnly=false&useOldAliasMetadataBehavior=true
+	url=jdbc:mysql://hostname:3306/dababase?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&failOverReadOnly=false&useOldAliasMetadataBehavior=true
 	#数据库账号
-	username=root
+	username=dbuser
 	#数据库密码
-	password=root
+	password=******
 	#初始化连接
 	initialSize=10
 	#最大连接数量
