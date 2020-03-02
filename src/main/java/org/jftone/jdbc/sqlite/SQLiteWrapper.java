@@ -29,4 +29,12 @@ public final class SQLiteWrapper extends SqlWrapper {
 		sb.append(" OFFSET ").append(firstResult);
 		return sb.toString();
 	}
+
+	@Override
+	public String buildSelectSQL(String sqlStatement, long firstResult, int maxResults) throws DbException {
+		StringBuilder sb = new StringBuilder(sqlStatement);
+		sb.append(" LIMIT ").append(maxResults);
+		sb.append(" OFFSET ").append(firstResult);
+		return sb.toString();
+	}
 }

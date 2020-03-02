@@ -52,7 +52,7 @@ public final class OracleWrapper extends SqlWrapper {
 			sb.append("SELECT * FROM(");
 			
 			//一层嵌套查询语句
-			sb.append("SELECT ROWNUM AS _num,_JFT.* FROM (");
+			sb.append("SELECT ROWNUM AS num_,JFT.* FROM (");
 			
 			//二层嵌套查询语句
 			sb.append("SELECT ").append(selectSb.toString()).append(" FROM " + tableName);
@@ -68,23 +68,31 @@ public final class OracleWrapper extends SqlWrapper {
 			}
 			//结束二层嵌套
 			
-			sb.append(") _JFT WHERE ROWNUM <=").append(firstResult+maxResults);
+			sb.append(") JFT WHERE ROWNUM <=").append(firstResult+maxResults);
 			//结束一层嵌套
 			
-			sb.append(") WHERE _num>=").append(firstResult);
+			sb.append(") WHERE num_>=").append(firstResult);
 			
 		}else {
 			sb.append("SELECT * FROM(");
 			//嵌套查询语句
-			sb.append("SELECT ROWNUM AS _num,").append(selectSb.toString()).append(" FROM " + tableName);
+			sb.append("SELECT ROWNUM AS num_,").append(selectSb.toString()).append(" FROM " + tableName);
 			sb.append(" WHERE ");
 			if(whereSb.length()>0) {
 				sb.append(whereSb.toString()).append(" AND ");
 			}
 			sb.append(" ROWNUM <=").append(firstResult+maxResults);
 			//结束嵌套
-			sb.append(") WHERE _num>=").append(firstResult);
+			sb.append(") WHERE num_>=").append(firstResult);
 		}
+		return sb.toString();
+	}
+
+	@Override
+	public String buildSelectSQL(String sqlStatement, long firstResult, int maxResults) throws DbException {
+		StringBuilder sb = new StringBuilder("SELECT * FROM (");
+		sb.append("SELECT ROWNUM AS num_, JFT.* FROM (").append(sqlStatement).append(") JFT ");
+		sb.append(" WHERE ROWNUM <=").append(firstResult+maxResults).append(") WHERE num_>=").append(firstResult);
 		return sb.toString();
 	}
 }

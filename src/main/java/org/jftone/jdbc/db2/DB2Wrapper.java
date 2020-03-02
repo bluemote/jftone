@@ -43,7 +43,7 @@ public final class DB2Wrapper extends SqlWrapper {
 		sb.append("SELECT * FROM(");
 		
 		//一层嵌套查询语句
-		sb.append("SELECT rownumber() over() as _num,_JFT.* FROM (");
+		sb.append("SELECT rownumber() over() as _num,JFT.* FROM (");
 		
 		//二层嵌套查询语句
 		sb.append("SELECT ").append(selectSb.toString()).append(" FROM " + tableName);
@@ -66,11 +66,19 @@ public final class DB2Wrapper extends SqlWrapper {
 		}
 		//结束二层嵌套
 		
-		sb.append(") as _JFT");
+		sb.append(") as JFT");
 		//结束一层嵌套
 		
 		sb.append(") WHERE _num between ").append(firstResult).append(" and ").append(firstResult+maxResults);
 		
+		return sb.toString();
+	}
+
+	@Override
+	public String buildSelectSQL(String sqlStatement, long firstResult, int maxResults) throws DbException {
+		StringBuilder sb = new StringBuilder("SELECT * FROM (");
+		sb.append("SELECT rownumber() over() as _num,JFT.* FROM (").append(sqlStatement).append(") JFT ");
+		sb.append(") WHERE _num between ").append(firstResult).append(" and ").append(firstResult+maxResults);
 		return sb.toString();
 	}
 }

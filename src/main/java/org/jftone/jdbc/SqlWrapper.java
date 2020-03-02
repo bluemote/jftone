@@ -109,7 +109,7 @@ public abstract class SqlWrapper {
 	 */
 	public String buildCountSQL(String tableName, List<String> condFields) throws DbException {
 		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT count(*) as RECORDS FROM " + tableName);
+		sb.append("SELECT count(1) as RECORDS FROM " + tableName);
 		if (null != condFields && !condFields.isEmpty()) {
 			sb.append(" WHERE ");
 			int i = 0;
@@ -162,7 +162,7 @@ public abstract class SqlWrapper {
 	}
 
 	/**
-	 * 组装分页查询
+	 * 按照model，组装分页查询
 	 * 
 	 * @param tableName
 	 * @param selectFields
@@ -175,5 +175,16 @@ public abstract class SqlWrapper {
 	 */
 	public abstract String buildSelectSQL(String tableName, List<String> selectFields, List<String> condFields,
 			List<SqlSort> sqlSortList, long firstResult, int maxResults) throws DbException;
+	
+	
+	/**
+	 * 解析SQL语句，组装分页查询
+	 * @param sqlStatement
+	 * @param firstResult
+	 * @param maxResults
+	 * @return
+	 * @throws DbException
+	 */
+	public abstract String buildSelectSQL(String sqlStatement, long firstResult, int maxResults) throws DbException;
 
 }

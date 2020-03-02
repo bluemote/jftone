@@ -725,12 +725,12 @@ public final class Dao {
 			JdbcType[] types = (typeList==null || typeList.size()==0)? null : typeList.toArray(new JdbcType[0]);
 			
 			if(page != null){
-				long resultCount = DBUtil.count(conn, "select count(*) from ("+sql+") JFT", params, types);
+				long resultCount = DBUtil.count(conn, "select count(1) from ("+sql+") JFT", params, types);
 				if(resultCount == 0){
 					return retList;
 				}
 				page.setRecordCount(resultCount);
-				sql += " LIMIT "+page.getStart()+Const.SPLIT_COMMA+page.getPageSize();
+				sql = datasource.getSqlWrapper().buildSelectSQL(sql, page.getStart(), page.getPageSize());
 			}
 			retList = DBUtil.query(conn, sql, params, types, new MapListHandler());
 			
@@ -759,12 +759,12 @@ public final class Dao {
 			JdbcType[] types = (typeList==null || typeList.size()==0)? null : typeList.toArray(new JdbcType[0]);
 			
 			if(page != null){
-				long resultCount = DBUtil.count(conn, "select count(*) from ("+sql+") JFT", params, types);
+				long resultCount = DBUtil.count(conn, "select count(1) from ("+sql+") JFT", params, types);
 				if(resultCount == 0){
 					return retList;
 				}
 				page.setRecordCount(resultCount);
-				sql += " LIMIT "+page.getStart()+Const.SPLIT_COMMA+page.getPageSize();
+				sql = datasource.getSqlWrapper().buildSelectSQL(sql, page.getStart(), page.getPageSize());
 			}
 			retList = DBUtil.query(conn, sql, params, types, new BeanListHandler<T>(retCls));
 		} catch (Exception e) {

@@ -39,4 +39,12 @@ public final class MySQLWrapper extends SqlWrapper {
 		sb.append(Const.SPLIT_COMMA).append(maxResults);
 		return sb.toString();
 	}
+
+	@Override
+	public String buildSelectSQL(String sqlStatement, long firstResult, int maxResults) throws DbException {
+		StringBuilder sb = new StringBuilder(sqlStatement);
+		sb.append(" LIMIT ").append(firstResult);
+		sb.append(Const.SPLIT_COMMA).append(maxResults);
+		return sb.toString();
+	}
 }

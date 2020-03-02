@@ -10,6 +10,7 @@ package org.jftone.jdbc.postgresql;
 
 import java.util.List;
 
+import org.jftone.config.Const;
 import org.jftone.exception.DbException;
 import org.jftone.jdbc.SqlSort;
 import org.jftone.jdbc.SqlWrapper;
@@ -34,6 +35,14 @@ public final class PostgreSQLWrapper extends SqlWrapper {
 	public String buildSelectSQL(String tableName, List<String> selectFields, 
 			List<String> condFields, List<SqlSort> sqlSortList, long firstResult, int maxResults) throws DbException{
 		StringBuilder sb = new StringBuilder(buildSelectSQL(tableName, selectFields, condFields, sqlSortList));
+		sb.append(" LIMIT ").append(maxResults);
+		sb.append(" ,OFFSET ").append(firstResult);
+		return sb.toString();
+	}
+
+	@Override
+	public String buildSelectSQL(String sqlStatement, long firstResult, int maxResults) throws DbException {
+		StringBuilder sb = new StringBuilder(sqlStatement);
 		sb.append(" LIMIT ").append(maxResults);
 		sb.append(" ,OFFSET ").append(firstResult);
 		return sb.toString();

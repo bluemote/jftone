@@ -37,4 +37,13 @@ public final class SQLServerWrapper extends SqlWrapper {
 		sb.append(" ROWS ONLY");
 		return sb.toString();
 	}
+
+	@Override
+	public String buildSelectSQL(String sqlStatement, long firstResult, int maxResults) throws DbException {
+		StringBuilder sb = new StringBuilder(sqlStatement);
+		sb.append(" OFFSET ").append(firstResult);
+		sb.append(" ROWS FETCH NEXT ").append(maxResults);
+		sb.append(" ROWS ONLY");
+		return sb.toString();
+	}
 }
