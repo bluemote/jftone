@@ -32,35 +32,34 @@ import okhttp3.Response;
 public final class OKHttpUtil {
 	private static Logger log = LoggerFactory.getLogger(OKHttpUtil.class);
 	private Proxy proxy = null;
-	private int timeout = 30;			//超时时间
+	private long timeout = 30; // 超时时间
 	private OkHttpClient okHttpClient = null;
-	private static final int READ_TIMEOUT = 30;
-	private static final int WRITE_TIMEOUT = 30;
+	private static final long READ_TIMEOUT = 30;
+	private static final long WRITE_TIMEOUT = 30;
 	public static String CONTENT_JSON = "application/json; charset=utf-8";
 	public static String CONTENT_TEXT = "text/plain; charset=utf-8";
 	public static String CONTENT_HTML = "text/html; charset=utf-8";
+	private Map<String, List<Cookie>> cookieStore = new HashMap<>();
 
 	private OKHttpUtil(boolean enableCookie) {
 		OkHttpClient.Builder clientBuilder = getClientBuilder();
-		if(enableCookie){
-			clientBuilder.cookieJar(new CookieJar(){
-				private final Map<HttpUrl, List<Cookie>> cookieStore = new HashMap<>(); 
-				
+		if (enableCookie) {
+			clientBuilder.cookieJar(new CookieJar() {
 				@Override
 				public void saveFromResponse(HttpUrl httpUrl, List<Cookie> cookies) {
-					cookieStore.put(httpUrl, cookies);
+					putCookies(httpUrl.host(), cookies);
 				}
 
 				@Override
 				public List<Cookie> loadForRequest(HttpUrl httpUrl) {
 					List<Cookie> cookies = cookieStore.get(httpUrl.host());
-		            return  null == cookies ? new ArrayList<Cookie>() : cookies;
+					return null == cookies ? new ArrayList<Cookie>() : cookies;
 				}
 			});
 		}
 		okHttpClient = clientBuilder.build();
 	}
-	
+
 	private static class OKHttpUtilHolder {
 		private static final OKHttpUtil INSTANCE = new OKHttpUtil(false);
 		private static final OKHttpUtil COOKIE_INSTANCE = new OKHttpUtil(true);
@@ -89,7 +88,7 @@ public final class OKHttpUtil {
 	public static OKHttpUtil getInstance(int timeout) {
 		return getInstance(timeout, false, null);
 	}
-	
+
 	public static OKHttpUtil getCookieInstance() {
 		return getInstance(0, true, null);
 	}
@@ -97,7 +96,7 @@ public final class OKHttpUtil {
 	public static OKHttpUtil getCookieInstance(int timeout) {
 		return getInstance(timeout, true, null);
 	}
-	
+
 	public static OKHttpUtil getProxyInstance(String host, int port) {
 		return getProxyInstance(host, port, 0);
 	}
@@ -105,16 +104,80 @@ public final class OKHttpUtil {
 	public static OKHttpUtil getProxyInstance(String host, int port, int timeout) {
 		return getInstance(timeout, false, new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port)));
 	}
-	
+
 	public static OKHttpUtil getInstance(int timeout, boolean enableCookie, Proxy proxy) {
-		OKHttpUtil instance = enableCookie? OKHttpUtilHolder.COOKIE_INSTANCE : OKHttpUtilHolder.INSTANCE;
-		if(timeout > 0){
+		OKHttpUtil instance = enableCookie ? OKHttpUtilHolder.COOKIE_INSTANCE : OKHttpUtilHolder.INSTANCE;
+		if (timeout > 0) {
 			instance.timeout = timeout;
 		}
-		if(null != proxy){
+		if (null != proxy) {
 			instance.proxy = proxy;
 		}
 		return instance;
+	}
+
+	/**
+	 * 添加Cookies
+	 * @param host
+	 * @param cookies
+	 */
+	public void putCookies(String host, List<Cookie> cookies) {
+		if (null == cookies || cookies.isEmpty()) {
+			return;
+		}
+		List<Cookie> newCookies = new ArrayList<>();
+		Map<String, Cookie> cookieMap = new HashMap<>();
+		for (Cookie cookie : cookies) {
+			cookieMap.put(cookie.name(), cookie);
+			newCookies.add(cookie);
+		}
+		List<Cookie> curCookies = cookieStore.get(host);
+		if (null != curCookies && !curCookies.isEmpty()) {
+			for (Cookie cookie : curCookies) {
+				if (!cookieMap.containsKey(cookie.name())) {
+					newCookies.add(cookie);
+				}
+			}
+		}
+		cookieStore.put(host, newCookies);
+	}
+
+	/**
+	 * 获取所有Cookies
+	 * 
+	 * @return
+	 */
+	public Map<String, List<Cookie>> getCookies() {
+		return cookieStore;
+	}
+
+	/**
+	 * 获取指定主机的所有Cookies
+	 * 
+	 * @return
+	 */
+	public List<Cookie> getCookies(String host) {
+		return cookieStore.get(host);
+	}
+
+	/**
+	 * 获取指定主机下某个Cookie的值
+	 * 
+	 * @param host
+	 * @param key
+	 * @return
+	 */
+	public String getCookieValue(String host, String key) {
+		String cookieValue = "";
+		List<Cookie> cookies = cookieStore.get(host);
+		if (null != cookies && !cookies.isEmpty()) {
+			for (Cookie cookie : cookies) {
+				if (cookie.name().equals(key)) {
+					cookieValue = cookie.value();
+				}
+			}
+		}
+		return cookieValue;
 	}
 
 	/**
@@ -144,8 +207,7 @@ public final class OKHttpUtil {
 		return sendRequest(createPostRequest(httpUrl, postStr));
 	}
 
-	public String sendPostRequest(String httpUrl, String postStr, IData<String, Object> headerData)
-			throws IOException {
+	public String sendPostRequest(String httpUrl, String postStr, IData<String, Object> headerData) throws IOException {
 		return sendRequest(createPostRequest(httpUrl, postStr, headerData));
 	}
 
@@ -162,8 +224,7 @@ public final class OKHttpUtil {
 	 * 创建HTTP POST请求
 	 * 
 	 * @param httpUrl
-	 * @param postStr
-	 *            POST字符串
+	 * @param postStr POST字符串
 	 * @return
 	 * @throws IOException
 	 */
@@ -233,8 +294,7 @@ public final class OKHttpUtil {
 	 * 发送FORM表单提交
 	 * 
 	 * @param httpUrl
-	 * @param paramData
-	 *            表单提交参数
+	 * @param paramData 表单提交参数
 	 * @return
 	 * @throws IOException
 	 */
@@ -246,10 +306,8 @@ public final class OKHttpUtil {
 	 * 发送带Header参数的表单提交
 	 * 
 	 * @param httpUrl
-	 * @param paramData
-	 *            表单提交参数
-	 * @param headerData
-	 *            header参数
+	 * @param paramData  表单提交参数
+	 * @param headerData header参数
 	 * @return
 	 * @throws IOException
 	 */
@@ -261,12 +319,9 @@ public final class OKHttpUtil {
 	/**
 	 * 发送 post请求（带文件）
 	 * 
-	 * @param httpUrl
-	 *            地址
-	 * @param param
-	 *            参数
-	 * @param files
-	 *            附件
+	 * @param httpUrl 地址
+	 * @param param   参数
+	 * @param files   附件
 	 * @throws IOException
 	 */
 	public String sendFormPost(String httpUrl, IData<String, Object> paramData, List<File> files) throws IOException {
@@ -328,7 +383,7 @@ public final class OKHttpUtil {
 		if (null != headerData && !headerData.isEmpty()) {
 			Headers.Builder hb = new Headers.Builder();
 			for (Map.Entry<String, Object> header : headerData.entrySet()) {
-				hb.set(header.getKey(), header.getValue().toString());
+				hb.set(header.getKey(), String.valueOf(header.getValue()));
 			}
 			headers = hb.build();
 		}
@@ -411,12 +466,12 @@ public final class OKHttpUtil {
 
 	/**
 	 * 创建一个可信的带CA签名证书HTTPS连接
+	 * 
 	 * @param sslSocketFactory
 	 * @return
 	 * @throws Exception
 	 */
-	public OkHttpClient createHttpsClient(SSLSocketFactory sslSocketFactory)
-			throws Exception {
+	public OkHttpClient createHttpsClient(SSLSocketFactory sslSocketFactory) throws Exception {
 		OkHttpClient.Builder clientBuilder = getClientBuilder();
 		clientBuilder.sslSocketFactory(sslSocketFactory, SSLSocketUtil.getX509TrustManager());
 		clientBuilder.hostnameVerifier(SSLSocketUtil.getAllTrustHostnameVerifier());
@@ -426,6 +481,7 @@ public final class OKHttpUtil {
 
 	/**
 	 * 创建一个默认的信任所有证书的HTTPS连接
+	 * 
 	 * @return
 	 * @throws Exception
 	 */

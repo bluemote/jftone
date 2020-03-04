@@ -5,13 +5,13 @@
 	<artifactId>jftone</artifactId>
 	<!--项目产生的构件类型，例如jar、war、ear、pom。插件可以创建他们自己的构件类型，所以前面列的不是全部构件类型 -->
 	<packaging>jar</packaging>
-	<version>1.2.9</version>
+	<version>1.2.12</version>
 	<name>Jftone</name>
 	<repositories>
 		<repository>
 			<id>maven-central</id>
 			<name>maven-central</name>
-			<url>${repository.url}/maven-central/</url>
+			<url>${repository.url}/maven-central</url>
 			<layout>default</layout>
 			<releases>
 				<enabled>true</enabled>
@@ -24,7 +24,7 @@
 	<pluginRepositories>
 		<pluginRepository>
 			<id>nexus</id>
-			<url>${repository.url}/maven-public/</url>
+			<url>${repository.url}/maven-public</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -36,14 +36,14 @@
 	<!-- 配置发布到私服 -->
 	<distributionManagement>
 		<repository>
-			<id>nexus</id>
+			<id>nexus-releases</id>
 			<name>Nexus Release Repository</name>
-			<url>${repository.url}/maven-releases/</url>
+			<url>${repository.url}/maven-releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>nexus</id>
+			<id>nexus-snapshots</id>
 			<name>Nexus Snapshot Repository</name>
-			<url>${repository.url}/maven-snapshots/</url>
+			<url>${repository.url}/maven-snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<properties>
@@ -79,9 +79,10 @@
 		<commons-pool2.version>2.4.2</commons-pool2.version>
 		<core.version>3.3.0</core.version>
 		<persistence-api.version>1.0.2</persistence-api.version>
-		<maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
-		<maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
-		<maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
+		<maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+		<maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
+		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
 		<okhttp3.version>3.9.1</okhttp3.version>
 		<okio.version>1.13.0</okio.version>
 		<kryo.version>4.0.1</kryo.version>
@@ -90,7 +91,7 @@
 		<mongodb.version>3.6.1</mongodb.version>
 		<zookeeper.version>3.4.11</zookeeper.version>
 		<rocketmq.version>4.2.0</rocketmq.version>
-		<netty.version>4.1.20.Final</netty.version>
+		<netty.version>4.1.38.Final</netty.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -329,10 +330,10 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
-				<excludes>
-					<exclude>**/*.xml</exclude>
-					<exclude>**/*.properties</exclude>
-				</excludes>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.properties</include>
+				</includes>
 			</resource>
 		</resources>
 		<plugins>
@@ -365,6 +366,14 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${maven-deploy-plugin.version}</version>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>${maven-jar-plugin.version}</version>
 				<configuration>
@@ -375,7 +384,9 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>org.jftone.listener.JFToneApp</mainClass>
+							<useUniqueVersions>false</useUniqueVersions>
+                            <classpathPrefix>lib/</classpathPrefix>
+							<!--mainClass>org.jftone.listener.JFToneApp</mainClass-->
 						</manifest>
 					</archive>
 				</configuration>
