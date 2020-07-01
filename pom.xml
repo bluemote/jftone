@@ -55,7 +55,7 @@
 		<slf4j.version>1.7.26</slf4j.version>
 		<xmemcached.version>2.2.0</xmemcached.version>
 		<jedis.version>2.9.0</jedis.version>
-		<mysql.version>5.1.40</mysql.version>
+		<mysql.version>8.0.16</mysql.version>
 		<json-lib.version>2.4</json-lib.version>
 		<ezmorph.version>1.0.6</ezmorph.version>
 		<freemarker.version>2.3.23</freemarker.version>
