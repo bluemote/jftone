@@ -49,7 +49,7 @@
 		<protostuff.version>1.6.0</protostuff.version>
 		<reflectasm.version>1.11.3</reflectasm.version>
 		<mongodb.version>3.6.1</mongodb.version>
-		<zookeeper.version>3.4.11</zookeeper.version>
+		<zookeeper.version>3.4.14</zookeeper.version>
 		<rocketmq.version>4.2.0</rocketmq.version>
 		<netty.version>4.1.38.Final</netty.version>
 	</properties>
