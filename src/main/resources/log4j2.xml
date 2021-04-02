@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--Configuration后面的status,这个用于设置log4j2自身内部的信息输出,可以不设置,当设置成trace时,你会看到log4j2内部各种详细输出 -->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身,设置间隔秒数 -->
+<Configuration status="OFF" monitorInterval="1800">
+	<Properties>
+		<property name="LOG_PATH">/apps/logs</property>
+		<property name="FILE_NAME">jftone</property>
+	</Properties>
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout charset="UTF-8" pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+
+		<RollingFile name="DebugLog" fileName="${LOG_PATH}/${FILE_NAME}.log"
+				filePattern="${LOG_PATH}/${FILE_NAME}.%d{yyyy-MM-dd}.log">
+			<ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n" />
+			<!--SizeBasedTriggeringPolicy size="50MB" /-->
+			<TimeBasedTriggeringPolicy />
+			<DefaultRolloverStrategy max="7"/>
+		</RollingFile>
+		<RollingFile name="ErrorLog" fileName="${LOG_PATH}/${FILE_NAME}.log"
+				filePattern="${LOG_PATH}/${FILE_NAME}.%d{yyyy-MM-dd}.log">
+			<ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n" />
+			<TimeBasedTriggeringPolicy />
+			<DefaultRolloverStrategy max="7"/>
+		</RollingFile>
+	</Appenders>
+
+	<Loggers>
+		<!-- 设置对打印sql语句的支持 -->
+		<Logger name="org.jftone" level="DEBUG" additivity="false"> 
+			<AppenderRef ref="ConsoleLog" /> 
+		</Logger>
+		<!--建立一个默认的root的logger -->
+		<!--Root level="DEBUG"><AppenderRef ref="ConsoleLog"/></Root-->
+	</Loggers>
+</Configuration>

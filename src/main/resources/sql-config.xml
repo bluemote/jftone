@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+JdbcType枚举可选类型
+[byte,short,int,long,float,double,decimal,boolean,string,date,time,datetime,object]
+-->
+<sqlMap>
+	<statement id="querySysUser" parse="false">
+  		<![CDATA[select * from sys_admin where id=#id# and user_name=#userName#]]>
+  	</statement>
+	<statement id="queryByCond" parse="true">
+  		<![CDATA[ select user_name,mobile,email,login_ip,login_time from sys_admin where user_name=#userName# <!- or mobile=#mobile# ->]]>
+  	</statement>
+	<statement id="queryByData">
+  		<![CDATA[select * from sys_admin where <!- user_name=#userName# ->]]>
+  	</statement>
+</sqlMap>
